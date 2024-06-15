@@ -98,7 +98,6 @@ const getAllBookingIntoDB = async () => {
   // Map each booking to extract necessary data
   const formattedBookings = bookings.map((booking) => ({
     _id: booking._id,
-    customer: booking.customer,
     service: booking.serviceId,
     slot: booking.slotId,
     vehicleType: booking.vehicleType,
@@ -122,8 +121,7 @@ const getBookingsByUserId = async (userId: string) => {
 
     return userBookings;
   } catch (error) {
-    throw new Error(
-      `Failed to fetch bookings for user ${userId}: ${error.message}`
+    throw new AppError( httpStatus.BAD_REQUEST,`Failed to fetch bookings for user `
     );
   }
 };

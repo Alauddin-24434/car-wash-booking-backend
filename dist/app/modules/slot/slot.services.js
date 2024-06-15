@@ -1,0 +1,43 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.services = exports.getAvilabeSlotIntoDB = void 0;
+const slot_model_1 = require("./slot.model");
+const slot_utils_1 = require("./slot.utils");
+const createSlotServicesIntoDB = (payload, duration) => __awaiter(void 0, void 0, void 0, function* () {
+    const { service, date, startTime, endTime } = payload;
+    const slotsArry = [];
+    const startMinutes = (0, slot_utils_1.parseTimeToMinutes)(startTime);
+    const endMinutes = (0, slot_utils_1.parseTimeToMinutes)(endTime);
+    for (let time = startMinutes; time < endMinutes; time += duration) {
+        const slot = {
+            service,
+            date,
+            startTime: (0, slot_utils_1.formatMinutesToTime)(time),
+            endTime: (0, slot_utils_1.formatMinutesToTime)(time + duration),
+            isBooked: 'available',
+        };
+        const createSlot = yield slot_model_1.Slot.create(slot);
+        slotsArry.push(createSlot);
+    }
+    return slotsArry;
+});
+//  Get available slots
+const getAvilabeSlotIntoDB = (serviceId, date) => __awaiter(void 0, void 0, void 0, function* () {
+    // Find slots in the database by service ID and date, and populate the service field with service details
+    const slots = yield slot_model_1.Slot.find({ service: serviceId, date }).populate('service');
+    return slots;
+});
+exports.getAvilabeSlotIntoDB = getAvilabeSlotIntoDB;
+exports.services = {
+    createSlotServicesIntoDB,
+    getAvilabeSlotIntoDB: exports.getAvilabeSlotIntoDB,
+};
