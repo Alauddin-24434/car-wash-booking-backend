@@ -10,6 +10,6 @@ router.post('/auth/signup' , validateRequest(zodUserValidations.zodUserValidatio
 
 // user login route
 
-router.post('/auth/login' ,userControllers.loginUser)
+// router.post('/auth/login' ,userControllers.loginUser)
 
 export const userRoutes= router;

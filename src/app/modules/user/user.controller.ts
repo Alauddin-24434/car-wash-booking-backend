@@ -65,7 +65,7 @@ const loginUser = catchAsync(async (req, res) => {
       email: user.email,
 
     },
-    config.jwtSecret as string,
+    config.jwt_access_secret as string,
     { expiresIn: '1h' }
   );
 console.log(token)

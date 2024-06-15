@@ -1,9 +1,11 @@
 import { model, Schema } from "mongoose";
-import { TUser } from "./user.interface";
+import { TUser, UserModel } from "./user.interface";
 import bcrypt from 'bcrypt';
 import config from "../../config";
+import AppError from "../../error/AppError";
+import httpStatus from "http-status";
 
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<TUser, UserModel>({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -45,6 +47,17 @@ const userSchema = new Schema<TUser>({
   }
 });
 
+
+
+
+userSchema.pre('save' , async function(next){
+  const isUserEmailExist=await User.findOne({ email:this.email});
+  if(isUserEmailExist){
+    throw new AppError(httpStatus.NOT_ACCEPTABLE,'This email is already exist!')
+  }
+  next()
+})
+
 userSchema.pre('save', async function (next) {
   const user = this;
 
@@ -57,10 +70,17 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// The post middleware is not needed if you are transforming the response using toJSON and toObject
-// userSchema.post('save', async function (doc, next) {
-//   doc.password = '';
-//   next();
-// });
+userSchema.statics.isUserExistsByEmail = async function (email: string) {
+  return await User.findOne({ email })
+};
 
-export const User = model<TUser>('User', userSchema);
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+
+
+export const User = model<TUser,UserModel>('User', userSchema);

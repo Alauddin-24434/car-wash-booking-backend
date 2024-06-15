@@ -92,8 +92,6 @@ const paramsId=req.params.id;
   });
 
 
-
-
 export const serviceControllers = {
   createService,
   UpdateServiceById,

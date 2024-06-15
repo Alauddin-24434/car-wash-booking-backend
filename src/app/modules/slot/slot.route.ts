@@ -1,12 +1,13 @@
 import express from 'express';
 import { slotControllers } from './slot.controllers';
-import authMiddleware from '../../auth/authMiddleware';
+
 import { slotzodValidations } from './slot.zodValidation';
 import validateRequest from '../../middlewares/validateTequest';
+import authValidation from '../../middlewares/auth';
 
 const router= express.Router();
 
-router.post('/services/slots', authMiddleware, slotControllers.createSlot, validateRequest(slotzodValidations.slotZodValidationSchema))
+router.post('/services/slots',  authValidation('admin'), validateRequest(slotzodValidations.slotZodValidationSchema) , slotControllers.createSlot )
 
 
 router.get('/slots/availability', slotControllers.getAvailableSlots)

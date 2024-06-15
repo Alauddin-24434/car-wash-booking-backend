@@ -3,6 +3,10 @@ import { Service } from './service.model';
 
 
  const createServiceServicesIntoDB = async (payload:TService) => {
+ 
+ 
+ 
+ 
     const service = await Service.create(payload)
     return service;
   
@@ -32,17 +36,12 @@ const getSingleServiceIntoDB= async (id:string)=>{
 };
 
 
- const deletedServicesIntoDB = async (id:string) => {
-    const softDeleted = await Service.updateOne({ _id: id},{isDeleted:true});
-    if(softDeleted.modifiedCount){
-        const data=await Service.findById(id)
-        console.log(data)
-        return data;
-    }
-
-
-  
+// Soft delete service by ID
+const deletedServicesIntoDB = async (id: string) => {
+    const softDeleted = await Service.updateOne({ _id: id }, { isDeleted: true });
+    return softDeleted;
 };
+
 
 
 export const services={
