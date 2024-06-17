@@ -33,9 +33,13 @@ Live URL: [Project Live URL](https://example.com)
    git clone https://github.com/yourusername/project-name.git
 
 2. Navigate to the project directory.
-cd project-name
+
+```bash
+  cd project-name
 
 3.Install dependencies.
-npm install
+
+  ```bash
+  npm install
 
 4. 

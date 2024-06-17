@@ -29,7 +29,7 @@ const createSlot = catchAsync(async (req, res) => {
     }
   
     const slots = await services.getAvilabeSlotIntoDB(serviceId as string, date as string);
-  //  console.log(slots)
+   console.log(slots)
    
     sendResponse(res, {
       statusCode: httpStatus.OK,

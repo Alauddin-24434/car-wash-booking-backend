@@ -1,53 +1,58 @@
+import httpStatus from 'http-status';
+import AppError from '../../error/AppError';
 import { TService } from './service.interface';
 import { Service } from './service.model';
 
-
- const createServiceServicesIntoDB = async (payload:TService) => {
- 
- 
- 
- 
-    const service = await Service.create(payload)
-    return service;
-  
+// Helper function to find a service by ID and check if it exists and is not soft-deleted
+const findService = async (id: string) => {
+  const service = await Service.findById(id);
+  if (!service || service.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Service not found!');
+  }
+  return service;
 };
 
-
-// get all services 
-
-const getAllServicesIntoDB= async ()=>{
-    const services= await Service.find();
-    return services;
-}
-
-//  get service find by Id
-
-const getSingleServiceIntoDB= async (id:string)=>{
-    const findService= await Service.findById(id)
-    return findService;
-}
-
- const updateServicesIntoDB = async (id:string, payload:TService) => {
-    const updatedService = await Service.updateOne({ _id: id }, payload);
-    if(updatedService.modifiedCount){
-        const data=await Service.findById(id)
-        return data;
-    }
+// Create a new service in the database
+const createServiceServicesIntoDB = async (payload: TService) => {
+  const service = await Service.create(payload);
+  return service;
 };
 
+// Get all services from the database
+const getAllServicesIntoDB = async () => {
+  const services = await Service.find({ isDeleted: { $ne: true } });
+  return services;
+};
 
-// Soft delete service by ID
+// Get a single service by ID from the database
+const getSingleServiceIntoDB = async (id: string) => {
+  return findService(id);
+};
+
+// Update a service by ID in the database
+const updateServicesIntoDB = async (id: string, payload: TService) => {
+  await findService(id); // Ensure the service exists before updating
+  const updatedService = await Service.updateOne({ _id: id }, payload);
+  if (updatedService.modifiedCount) {
+    return findService(id); // Return the updated service
+  }
+  throw new AppError(httpStatus.NOT_MODIFIED, 'Service update failed!');
+};
+
+// Soft delete a service by ID in the database
 const deletedServicesIntoDB = async (id: string) => {
-    const softDeleted = await Service.updateOne({ _id: id }, { isDeleted: true });
-    return softDeleted;
+  await findService(id);
+  await Service.updateOne({ _id: id }, { isDeleted: true });
+  const result= await Service.findById(id)
+  return result;
+ 
 };
 
-
-
-export const services={
-   createServiceServicesIntoDB,
-   updateServicesIntoDB ,
-   deletedServicesIntoDB ,
-   getSingleServiceIntoDB,
-   getAllServicesIntoDB
-}
+// Export all service functions
+export const services = {
+  createServiceServicesIntoDB,
+  getAllServicesIntoDB,
+  getSingleServiceIntoDB,
+  updateServicesIntoDB,
+  deletedServicesIntoDB
+};

@@ -1,10 +1,7 @@
-export type TSlot ={
-    service:object;
-    date: string;
-    startTime: string;
-    isBooked: string;
-    endTime: string;
-  }
-  
-
-
+export type TSlot = {
+  service: object;
+  date: string;
+  startTime: string;
+  isBooked: 'available' | 'booked' | 'canceled';
+  endTime: string;
+};

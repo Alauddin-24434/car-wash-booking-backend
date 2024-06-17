@@ -1,4 +1,6 @@
 
+import httpStatus from "http-status";
+import AppError from "../../error/AppError";
 import { TSlot } from "./slot.interface";
 import { Slot } from "./slot.model";
 import { formatMinutesToTime, parseTimeToMinutes } from "./slot.utils";
@@ -37,6 +39,11 @@ const createSlotServicesIntoDB = async (payload:TSlot,duration:number) => {
 export const  getAvilabeSlotIntoDB = async (serviceId: string, date: string) => {
   // Find slots in the database by service ID and date, and populate the service field with service details
     const slots = await Slot.find({ service: serviceId, date }).populate('service');
+   console.log(slots)
+   if (!slots || slots.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Slots not found!');
+  }
+    
     return slots;
   };
   

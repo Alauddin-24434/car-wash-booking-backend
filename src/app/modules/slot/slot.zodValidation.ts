@@ -6,7 +6,6 @@ const slotZodValidationSchema = z.object({
     date: z.string(),
     startTime: z.string(),
     endTime: z.string(),
-    isBooked: z.string(),
   }),
 });
 

@@ -12,6 +12,6 @@ router.post('/bookings', authValidation('user') ,validateRequest(bookingzodValid
 
 // get all booking
 router.get('/bookings', authValidation('admin'), BookingControllers.getAllBooking)
-router.get('/my-bookings',authValidation('user') , BookingControllers.getAllBooking)
+router.get('/my-bookings',authValidation('user') , BookingControllers.getMyBookings)
 
 export const BookingRoutes= router;

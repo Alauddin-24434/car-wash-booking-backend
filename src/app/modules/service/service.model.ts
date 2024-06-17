@@ -39,16 +39,18 @@ serviceSchema.pre('updateOne', async function (next) {
 });
 
 // Soft delete filter when getting all services
-serviceSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
+// serviceSchema.pre('find', function (next) {
+//   this.find({ isDeleted: { $ne: true } });
+//   next();
+// });
 
 // Soft delete filter when getting a single service
-serviceSchema.pre('findOne', function (next) {
-  this.findOne({ isDeleted: { $ne: true } });
-  next();
-});
+// serviceSchema.pre('findOne', function (next) {
+//   this.findOne({ isDeleted: { $ne: true } });
+//   next();
+// });
+
+
 
 // Soft delete filter for aggregation queries
 serviceSchema.pre('aggregate', function (next) {

@@ -1,6 +1,8 @@
 export type VehicleType = 'car' | 'truck' | 'SUV' | 'van' | 'motorcycle' | 'bus' | 'electricVehicle' | 'hybridVehicle' | 'bicycle' | 'tractor';
 
 export type TBooking = {
+
+  customer:object;
   serviceId: object;
   slotId: object;
   vehicleType: VehicleType;

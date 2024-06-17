@@ -10,7 +10,7 @@ const router= express.Router();
 
 router.post('/services',  authValidation('admin'),  validateRequest(zodServiceValidations.serviceZodValidationSchema),  serviceControllers.createService)
 
-router.get('/services', authValidation(), serviceControllers.getAllServices)
+router.get('/services',  serviceControllers.getAllServices)
 router.get('/services/:id',   serviceControllers.getSingleService)
 
 

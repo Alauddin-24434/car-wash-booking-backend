@@ -32,9 +32,9 @@ const getAllBooking = catchAsync(async (req, res) => {
 
 
 const getMyBookings = catchAsync(async (req, res,) => {
-    const userId = req?.user?.id; // Assuming user ID is stored in req.user.id after authentication
-  
-    const userBookings = await services.getBookingsByUserId(userId);
+ 
+    const token :any= req.headers.authorization?.replace("Bearer ", "");
+    const userBookings = await services.getBookingsByUserId(token);
   
     sendResponse(res, {
       statusCode: httpStatus.OK,

@@ -3,6 +3,12 @@ import { TBooking } from "./booking.interface";
 
 const bookingSchema = new Schema<TBooking>(
   {
+    customer: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    
+     
+    },
     serviceId: {
       type: Schema.Types.ObjectId,
       ref: "Service",
@@ -43,7 +49,6 @@ const bookingSchema = new Schema<TBooking>(
     manufacturingYear: {
       type: Number,
       required: [true, "Manufacturing year is required"],
-      
     },
     registrationPlate: {
       type: String,
