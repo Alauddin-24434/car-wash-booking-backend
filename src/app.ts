@@ -10,9 +10,8 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
-
 // application routes
-app.use('/', router)
+app.use("/", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("server is running on 5000");

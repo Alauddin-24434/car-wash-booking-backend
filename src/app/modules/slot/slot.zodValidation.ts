@@ -9,9 +9,6 @@ const slotZodValidationSchema = z.object({
   }),
 });
 
-
-
 export const slotzodValidations = {
-    slotZodValidationSchema
- 
+  slotZodValidationSchema,
 };

@@ -6,11 +6,11 @@ import AppError from "../../error/AppError";
 import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
-import { User } from "../user/user.model";
+
 
 const createBookingServicesIntoDB = async (
   payload: TBooking,
-  token: string
+  token: string,
 ) => {
   const session = await mongoose.startSession();
 
@@ -20,7 +20,7 @@ const createBookingServicesIntoDB = async (
     // checking if the given token is valid
     const decoded = jwt.verify(
       token,
-      config.jwt_access_secret as string
+      config.jwt_access_secret as string,
     ) as JwtPayload;
 
     const { userId } = decoded;
@@ -28,7 +28,7 @@ const createBookingServicesIntoDB = async (
       ...payload,
       customer: userId, // Set customer ID from the decoded token
     };
-    console.log(bookingPayload);
+    // console.log(bookingPayload);
     // Create the booking with the provided payload
     const [newBooking] = await Booking.create([bookingPayload], { session });
 
@@ -36,7 +36,7 @@ const createBookingServicesIntoDB = async (
     const updatedSlot = await Slot.findByIdAndUpdate(
       payload.slotId,
       { isBooked: "booked" },
-      { new: true, session }
+      { new: true, session },
     );
 
     if (!updatedSlot) {
@@ -123,22 +123,28 @@ const getAllBookingIntoDB = async () => {
 const getBookingsByUserId = async (token: string) => {
   try {
     // Check if the given token is valid
-    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      config.jwt_access_secret as string,
+    ) as JwtPayload;
     const { userId } = decoded;
 
     // Query to fetch bookings associated with a user
     const userBookings = await Booking.find({ customer: userId })
-      .populate('customer')
-      .populate('serviceId')
-      .populate('slotId');
+      .populate("customer")
+      .populate("serviceId")
+      .populate("slotId");
 
     return userBookings;
   } catch (error) {
     // Log the error for debugging purposes
-    console.error('Error fetching bookings:', error);
+    // console.error('Error fetching bookings:', error);
 
     // Throw a new error with a message and status code
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to fetch bookings for user');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Failed to fetch bookings for user",
+    );
   }
 };
 

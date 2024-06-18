@@ -15,9 +15,11 @@ export const VehicleTypeEnum = z.enum([
 
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
- const zodbookingSchema = z.object({
+const zodbookingSchema = z.object({
   body: z.object({
-    serviceId: z.string().regex(objectIdRegex, { message: "Invalid service ID" }),
+    serviceId: z
+      .string()
+      .regex(objectIdRegex, { message: "Invalid service ID" }),
     slotId: z.string().regex(objectIdRegex, { message: "Invalid slot ID" }),
     vehicleType: VehicleTypeEnum,
     vehicleBrand: z.string(),
@@ -28,6 +30,6 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
   }),
 });
 
-export const bookingzodValiditions={
-    zodbookingSchema,
-}
+export const bookingzodValiditions = {
+  zodbookingSchema,
+};

@@ -1,4 +1,3 @@
-
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { services } from "./booking.services";
@@ -6,10 +5,11 @@ import sendResponse from "../../utils/sendResponse";
 
 const createBooking = catchAsync(async (req, res) => {
   const bookingData = req.body;
-  const token :any= req.headers.authorization?.replace("Bearer ", "");
+  const token= req.headers.authorization?.replace("Bearer ", "");
 
   const createdBooking = await services.createBookingServicesIntoDB(
-    bookingData,token
+    bookingData,
+    token as string,
   );
 
   sendResponse(res, {
@@ -30,23 +30,20 @@ const getAllBooking = catchAsync(async (req, res) => {
   });
 });
 
+const getMyBookings = catchAsync(async (req, res) => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  const userBookings = await services.getBookingsByUserId(token as string);
 
-const getMyBookings = catchAsync(async (req, res,) => {
- 
-    const token :any= req.headers.authorization?.replace("Bearer ", "");
-    const userBookings = await services.getBookingsByUserId(token);
-  
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "User bookings retrieved successfully",
-      data: userBookings,
-    });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User bookings retrieved successfully",
+    data: userBookings,
   });
-  
+});
 
 export const BookingControllers = {
   createBooking,
   getAllBooking,
-  getMyBookings
+  getMyBookings,
 };

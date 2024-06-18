@@ -1,11 +1,10 @@
 import httpStatus from "http-status";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { userServices } from "./user.service";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import config from "../../config";
-
 
 // Create user
 const createUser = catchAsync(async (req, res) => {
@@ -19,8 +18,6 @@ const createUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
-
 
 // Login user
 const loginUser = catchAsync(async (req, res) => {
@@ -63,14 +60,12 @@ const loginUser = catchAsync(async (req, res) => {
       sub: user._id,
       name: user.name,
       email: user.email,
-
     },
     config.jwt_access_secret as string,
-    { expiresIn: '1h' }
+    { expiresIn: "1h" },
   );
-console.log(token)
+  // console.log(token)
   // Remove password from user object before sending the response
-
 
   // Return response
   sendResponse(res, {

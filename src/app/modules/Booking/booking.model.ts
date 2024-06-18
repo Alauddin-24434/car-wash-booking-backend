@@ -6,8 +6,6 @@ const bookingSchema = new Schema<TBooking>(
     customer: {
       type: Schema.Types.ObjectId,
       ref: "User",
-    
-     
     },
     serviceId: {
       type: Schema.Types.ObjectId,
@@ -55,7 +53,7 @@ const bookingSchema = new Schema<TBooking>(
       required: [true, "Registration plate is required"],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Booking = model<TBooking>("Booking", bookingSchema);

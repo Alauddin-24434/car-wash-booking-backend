@@ -1,13 +1,12 @@
 // models/Slot.ts
-import { model, Schema } from 'mongoose';
-import { TSlot } from './slot.interface';
-
+import { model, Schema } from "mongoose";
+import { TSlot } from "./slot.interface";
 
 const slotSchema = new Schema<TSlot>(
   {
     service: {
       type: Schema.Types.ObjectId,
-      ref: 'Service',
+      ref: "Service",
       required: true,
     },
     date: {
@@ -24,11 +23,11 @@ const slotSchema = new Schema<TSlot>(
     },
     isBooked: {
       type: String,
-      enum: ['available', 'booked', 'canceled'],
-      default: 'available',
+      enum: ["available", "booked", "canceled"],
+      default: "available",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const Slot = model<TSlot>('Slot', slotSchema);
+export const Slot = model<TSlot>("Slot", slotSchema);

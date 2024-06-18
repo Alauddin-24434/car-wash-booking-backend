@@ -1,8 +1,17 @@
-export type VehicleType = 'car' | 'truck' | 'SUV' | 'van' | 'motorcycle' | 'bus' | 'electricVehicle' | 'hybridVehicle' | 'bicycle' | 'tractor';
+export type VehicleType =
+  | "car"
+  | "truck"
+  | "SUV"
+  | "van"
+  | "motorcycle"
+  | "bus"
+  | "electricVehicle"
+  | "hybridVehicle"
+  | "bicycle"
+  | "tractor";
 
 export type TBooking = {
-
-  customer:object;
+  customer: object;
   serviceId: object;
   slotId: object;
   vehicleType: VehicleType;
@@ -12,5 +21,4 @@ export type TBooking = {
   registrationPlate: string;
   createdAt?: Date;
   updatedAt?: Date;
-}
-
+};

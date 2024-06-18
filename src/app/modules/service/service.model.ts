@@ -26,14 +26,14 @@ const serviceSchema = new Schema<TService>(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-serviceSchema.pre('updateOne', async function (next) {
+serviceSchema.pre("updateOne", async function (next) {
   const filter = this.getFilter();
   const service = await Service.findById(filter._id);
   if (!service) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Deleted id does not exist!');
+    throw new AppError(httpStatus.BAD_REQUEST, "Deleted id does not exist!");
   }
   next();
 });
@@ -50,12 +50,10 @@ serviceSchema.pre('updateOne', async function (next) {
 //   next();
 // });
 
-
-
 // Soft delete filter for aggregation queries
-serviceSchema.pre('aggregate', function (next) {
+serviceSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
 
-export const Service = model<TService>('Service', serviceSchema);
+export const Service = model<TService>("Service", serviceSchema);
