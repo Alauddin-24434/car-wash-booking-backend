@@ -1,23 +1,17 @@
-# Project Name
+# Car-Wash-Booking-System
 
-Short description or tagline about your project.
 
-Live URL: [Project Live URL](https://example.com)
-
-## Features
-
-- Feature 1
-- Feature 2
-- ...
+Live URL: https://car-wash-booking-system-liard.vercel.app
 
 ## Technologies Used
 
 - Node.js
 - Express.js
 - MongoDB
-- React (if applicable)
-- TypeScript (if applicable)
-- etc.
+- Mongoose
+- Typescrit
+- zod
+- jsonwetoken
 
 ## Installation and Setup
 
@@ -29,17 +23,36 @@ Live URL: [Project Live URL](https://example.com)
 ### Installation
 
 1. Clone the repository.
-   ```bash
-   git clone https://github.com/yourusername/project-name.git
+<pre>
+   https://github.com/Alauddin-24434/Car-Wash-Booking-System.git
+</pre>
 
 2. Navigate to the project directory.
 
-```bash
-  cd project-name
+<pre>
+     cd Car-Wash-Booking-System
+</pre>
+
 
 3.Install dependencies.
 
-  ```bash
-  npm install
+<pre>
+     npm install
+</pre>
 
-4. 
+
+4. .env file dependencies.
+   <pre>
+      NODE_ENV=development
+      PORT=5000
+      DATABASE_URL=your mongodb url
+      BCRYPT_SALT_ROUNDS=12
+      DEFAULT_PASS=phuniversity!@#
+      ZWT_ACCESS_SECRET=b1bd3f9120550679135e8c284f574e3cc32203aeb393ad8bb306c55a3ff1aaed
+
+   </pre> 
+
+   5. localhost server 5000 run 
+      <pre>
+         npm run start:dev
+      </pre>
