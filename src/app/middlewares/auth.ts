@@ -9,7 +9,9 @@ import { User } from "../modules/user/user.model";
 
 const authValidation = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.replace("Bearer ", ""); // Remove 'Bearer ' from token
+    const token = req.headers.authorization?.split(' ')[1]; 
+ 
+   
     // checking if the token is missing
     if (!token) {
       throw new AppError(
