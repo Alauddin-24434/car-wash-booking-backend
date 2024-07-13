@@ -1,9 +1,9 @@
-# Car-Wash-Booking-System
+# Car-Wash-Booking-System-mui
 
 
 Live URL: https://car-wash-booking-system-liard.vercel.app
 
-# Key Features
+# Key Features:
 User Registration and Login:
 
 Existing users can login with their password, email.
