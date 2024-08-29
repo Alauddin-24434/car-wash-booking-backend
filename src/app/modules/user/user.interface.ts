@@ -10,9 +10,12 @@ export interface TUser {
   phone: string;
   role: "admin" | "user";
   address: string;
+  isDeleted: boolean;
 }
 
 export interface UserModel extends Model<TUser> {
+    //instance methods for checking if the user exist
+    isUserExistsByCustomId(id: string): Promise<TUser>;
   //instance methods for checking if the user exist
   isUserExistsByEmail(email: string): Promise<TUser>;
   //instance methods for checking if passwords are matched

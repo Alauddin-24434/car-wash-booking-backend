@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 const zodUserValidationSchema = z.object({
   body: z.object({
@@ -8,6 +8,7 @@ const zodUserValidationSchema = z.object({
     phone: z.string(),
     role: z.enum(["user", "admin"]),
     address: z.string(),
+    isDeleted:boolean(),
   }),
 });
 
