@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   "/services/slots",
-  authValidation("admin"),
+  // authValidation("admin"),
   validateRequest(slotzodValidations.slotZodValidationSchema),
   slotControllers.createSlot,
 );

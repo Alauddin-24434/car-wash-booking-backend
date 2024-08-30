@@ -10,26 +10,32 @@ import config from "../../config";
 
 const createBookingServicesIntoDB = async (
   payload: TBooking,
-  token: string,
+
 ) => {
   const session = await mongoose.startSession();
 
   session.startTransaction();
 
   try {
-    // checking if the given token is valid
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string,
-    ) as JwtPayload;
+    
+    const { slotId:id  } = payload;
 
-    const { userId } = decoded;
+    // Check if the slot is available
+    const slot = await Slot.findById(id).session(session);
+    
+    if (!slot) {
+      throw new AppError(httpStatus.NOT_FOUND, "Slot not found");
+    }
+
+    if (slot.isBooked === "booked") {
+      throw new AppError(httpStatus.BAD_REQUEST, "Slot is already booked");
+    }
+
     const bookingPayload = {
       ...payload,
-      customer: userId, // Set customer ID from the decoded token
     };
-    // console.log(bookingPayload);
-    // Create the booking with the provided payload
+
+  
     const [newBooking] = await Booking.create([bookingPayload], { session });
 
     // Update the slot to set isBooked to "booked"

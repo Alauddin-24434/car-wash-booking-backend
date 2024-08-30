@@ -5,11 +5,11 @@ import sendResponse from "../../utils/sendResponse";
 
 const createBooking = catchAsync(async (req, res) => {
   const bookingData = req.body;
-  const token= req.headers.authorization?.replace("Bearer ", "");
+  // const token= req.headers.authorization;
 
   const createdBooking = await services.createBookingServicesIntoDB(
     bookingData,
-    token as string,
+    // token as string,
   );
 
   sendResponse(res, {
