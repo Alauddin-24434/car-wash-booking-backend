@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   "/services",
-  // authValidation("admin"),
+  authValidation("admin"),
   validateRequest(zodServiceValidations.serviceZodValidationSchema),
   serviceControllers.createService,
 );

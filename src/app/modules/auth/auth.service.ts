@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import { User } from "../user/user.model";
 import { TLoginUser } from "./auth.interface";
 import AppError from "../../error/AppError";
-import jwt from "jsonwebtoken";
+
 import config from "../../config";
 import { createToken } from "./auth.utils";
 

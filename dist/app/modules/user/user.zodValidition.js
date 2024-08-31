@@ -10,6 +10,7 @@ const zodUserValidationSchema = zod_1.z.object({
         phone: zod_1.z.string(),
         role: zod_1.z.enum(["user", "admin"]),
         address: zod_1.z.string(),
+        isDeleted: (0, zod_1.boolean)(),
     }),
 });
 exports.zodUserValidations = {

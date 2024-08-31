@@ -33,6 +33,7 @@ const getAllServices = catchAsync(async (req, res) => {
 const getSingleService = catchAsync(async (req, res) => {
   const findById = req.params.id;
 
+
   const result = await services.getSingleServiceIntoDB(findById);
 
   sendResponse(res, {

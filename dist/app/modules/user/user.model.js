@@ -45,6 +45,10 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: [true, "Address is required"],
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true,
     toJSON: {
@@ -81,6 +85,11 @@ userSchema.pre("save", function (next) {
 userSchema.statics.isUserExistsByEmail = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield exports.User.findOne({ email });
+    });
+};
+userSchema.statics.isUserExistsByCustomId = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield exports.User.findById(id);
     });
 };
 userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPassword) {

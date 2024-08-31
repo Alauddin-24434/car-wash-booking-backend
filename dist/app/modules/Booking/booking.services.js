@@ -20,16 +20,20 @@ const AppError_1 = __importDefault(require("../../error/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../../config"));
-const createBookingServicesIntoDB = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
+const createBookingServicesIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        // checking if the given token is valid
-        const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
-        const { userId } = decoded;
-        const bookingPayload = Object.assign(Object.assign({}, payload), { customer: userId });
-        // console.log(bookingPayload);
-        // Create the booking with the provided payload
+        const { slotId: id } = payload;
+        // Check if the slot is available
+        const slot = yield slot_model_1.Slot.findById(id).session(session);
+        if (!slot) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Slot not found");
+        }
+        if (slot.isBooked === "booked") {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Slot is already booked");
+        }
+        const bookingPayload = Object.assign({}, payload);
         const [newBooking] = yield booking_model_1.Booking.create([bookingPayload], { session });
         // Update the slot to set isBooked to "booked"
         const updatedSlot = yield slot_model_1.Slot.findByIdAndUpdate(payload.slotId, { isBooked: "booked" }, { new: true, session });

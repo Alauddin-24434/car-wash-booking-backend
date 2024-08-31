@@ -6,6 +6,8 @@ const serviceZodValidationSchema = z.object({
     description: z.string(),
     price: z.number(),
     duration: z.number(),
+    image:z.string(),
+
     isDeleted: z.boolean(),
   }),
 });
@@ -15,6 +17,7 @@ const updateServiceZodValidationSchema = z.object({
     description: z.string().optional(),
     price: z.number().optional(),
     duration: z.number().optional(),
+    image:z.string(),
     isDeleted: z.boolean().optional(),
   }),
 });

@@ -30,8 +30,13 @@ const createSlotServicesIntoDB = async (payload: TSlot, duration: number) => {
 //  Get available slots
 
 export const getAvilabeSlotIntoDB = async (serviceId: string, date: string) => {
+
+  console.log(serviceId,date)
+  
+  
+ 
   // Find slots in the database by service ID and date, and populate the service field with service details
-  const slots = await Slot.find({ service: serviceId, date }).populate(
+  const slots = await Slot.find({  date ,service: serviceId}).populate(
     "service",
   );
   //  console.log(slots)

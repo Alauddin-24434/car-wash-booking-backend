@@ -18,10 +18,9 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const booking_services_1 = require("./booking.services");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const bookingData = req.body;
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
-    const createdBooking = yield booking_services_1.services.createBookingServicesIntoDB(bookingData, token);
+    // const token= req.headers.authorization;
+    const createdBooking = yield booking_services_1.services.createBookingServicesIntoDB(bookingData);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -39,8 +38,8 @@ const getAllBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
 }));
 const getMyBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const token = (_b = req.headers.authorization) === null || _b === void 0 ? void 0 : _b.replace("Bearer ", "");
+    var _a;
+    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
     const userBookings = yield booking_services_1.services.getBookingsByUserId(token);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

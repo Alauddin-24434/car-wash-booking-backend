@@ -8,7 +8,7 @@ import authValidation from "../../middlewares/auth";
 const router = express.Router();
 
 router.post(
-  "/services/slots",
+  "/slots",
   // authValidation("admin"),
   validateRequest(slotzodValidations.slotZodValidationSchema),
   slotControllers.createSlot,

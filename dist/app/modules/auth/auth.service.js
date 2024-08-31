@@ -16,8 +16,8 @@ exports.AuthServices = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const user_model_1 = require("../user/user.model");
 const AppError_1 = __importDefault(require("../../error/AppError"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../../config"));
+const auth_utils_1 = require("./auth.utils");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     // checking if the user is exist
     const user = yield user_model_1.User.isUserExistsByEmail(payload.email);
@@ -32,13 +32,12 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         userId: user === null || user === void 0 ? void 0 : user.id,
         role: user.role,
     };
-    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwt_access_secret, {
-        expiresIn: "10d",
-    });
-    return {
-        accessToken,
-        user,
-    };
+    // const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    //   expiresIn: "10d",
+    // });
+    const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    const refreshToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_refresh_secret, config_1.default.jwt_refresh_expires_in);
+    return { accessToken, refreshToken };
 });
 exports.AuthServices = {
     loginUser,

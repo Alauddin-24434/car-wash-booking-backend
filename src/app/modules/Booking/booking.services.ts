@@ -51,20 +51,15 @@ const createBookingServicesIntoDB = async (
 
     // Populate the related fields
     const populatedBooking = await (
-      await (await newBooking.populate("customer")).populate("serviceId")
+      await (await newBooking.populate("customerId")).populate("serviceId")
     ).populate("slotId");
 
     // Destructure the populated fields
     const {
       _id,
-      customer,
+      customerId,
       serviceId,
       slotId,
-      vehicleType,
-      vehicleBrand,
-      vehicleModel,
-      manufacturingYear,
-      registrationPlate,
       createdAt,
       updatedAt,
     } = populatedBooking;
@@ -80,14 +75,9 @@ const createBookingServicesIntoDB = async (
       message: "Booking created successfully",
       data: {
         _id,
-        customer,
+        customerId,
         service: serviceId,
         slot: slotId,
-        vehicleType,
-        vehicleBrand,
-        vehicleModel,
-        manufacturingYear,
-        registrationPlate,
         createdAt,
         updatedAt,
       },
@@ -104,21 +94,16 @@ const getAllBookingIntoDB = async () => {
   // Fetch all bookings and populate related fields
 
   const bookings = await Booking.find()
-    .populate("customer")
+    .populate("customerId")
     .populate("serviceId")
     .populate("slotId");
 
   // Map each booking to extract necessary data
   const formattedBookings = bookings.map((booking) => ({
     _id: booking._id,
-    customer: booking?.customer,
+    customer: booking?.customerId,
     service: booking.serviceId,
     slot: booking.slotId,
-    vehicleType: booking.vehicleType,
-    vehicleBrand: booking.vehicleBrand,
-    vehicleModel: booking.vehicleModel,
-    manufacturingYear: booking.manufacturingYear,
-    registrationPlate: booking.registrationPlate,
     createdAt: booking.createdAt,
     updatedAt: booking.updatedAt,
   }));
@@ -136,8 +121,8 @@ const getBookingsByUserId = async (token: string) => {
     const { userId } = decoded;
 
     // Query to fetch bookings associated with a user
-    const userBookings = await Booking.find({ customer: userId })
-      .populate("customer")
+    const userBookings = await Booking.find({ customerId: userId })
+      .populate("customerId")
       .populate("serviceId")
       .populate("slotId");
 

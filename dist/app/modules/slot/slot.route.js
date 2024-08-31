@@ -8,8 +8,9 @@ const express_1 = __importDefault(require("express"));
 const slot_controllers_1 = require("./slot.controllers");
 const slot_zodValidation_1 = require("./slot.zodValidation");
 const validateTequest_1 = __importDefault(require("../../middlewares/validateTequest"));
-const auth_1 = __importDefault(require("../../middlewares/auth"));
 const router = express_1.default.Router();
-router.post("/services/slots", (0, auth_1.default)("admin"), (0, validateTequest_1.default)(slot_zodValidation_1.slotzodValidations.slotZodValidationSchema), slot_controllers_1.slotControllers.createSlot);
+router.post("/services/slots", 
+// authValidation("admin"),
+(0, validateTequest_1.default)(slot_zodValidation_1.slotzodValidations.slotZodValidationSchema), slot_controllers_1.slotControllers.createSlot);
 router.get("/slots/availability", slot_controllers_1.slotControllers.getAvailableSlots);
 exports.SlotRoutes = router;

@@ -8,6 +8,7 @@ const createSlot = catchAsync(async (req, res) => {
   const duration = 60; // Assume 60 minutes for the example
 
   const serviceData = req.body;
+  
 
   const result = await services.createSlotServicesIntoDB(serviceData, duration);
 

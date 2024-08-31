@@ -31,12 +31,12 @@ const createSlot = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 }));
 exports.getAvailableSlots = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { date, serviceId } = req.query;
-    if (!date || !serviceId) {
-        res
-            .status(400)
-            .json({ success: false, message: "Date and serviceId are required" });
-        return;
-    }
+    // if (!date || !serviceId) {
+    //   res
+    //     .status(400)
+    //     .json({ success: false, message: "Date and serviceId are required" });
+    //   return;
+    // }
     const slots = yield slot_services_1.services.getAvilabeSlotIntoDB(serviceId, date);
     //  console.log(slots)
     (0, sendResponse_1.default)(res, {

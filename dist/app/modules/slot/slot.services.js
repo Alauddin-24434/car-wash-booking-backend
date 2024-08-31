@@ -37,9 +37,10 @@ const createSlotServicesIntoDB = (payload, duration) => __awaiter(void 0, void 0
 });
 //  Get available slots
 const getAvilabeSlotIntoDB = (serviceId, date) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(serviceId, date);
     // Find slots in the database by service ID and date, and populate the service field with service details
-    const slots = yield slot_model_1.Slot.find({ service: serviceId, date }).populate("service");
-    //  console.log(slots)
+    const slots = yield slot_model_1.Slot.find().populate("service");
+    console.log(slots);
     if (!slots || slots.length === 0) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Slots not found!");
     }

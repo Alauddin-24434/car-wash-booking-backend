@@ -3,7 +3,7 @@ import { TBooking } from "./booking.interface";
 
 const bookingSchema = new Schema<TBooking>(
   {
-    customer: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
@@ -17,41 +17,8 @@ const bookingSchema = new Schema<TBooking>(
       ref: "Slot",
       required: [true, "Slot ID is required"],
     },
-    vehicleType: {
-      type: String,
-      enum: {
-        values: [
-          "car",
-          "truck",
-          "SUV",
-          "van",
-          "motorcycle",
-          "bus",
-          "electricVehicle",
-          "hybridVehicle",
-          "bicycle",
-          "tractor",
-        ],
-        message: "Vehicle type is not valid",
-      },
-      required: [true, "Vehicle type is required"],
-    },
-    vehicleBrand: {
-      type: String,
-      required: [true, "Vehicle brand is required"],
-    },
-    vehicleModel: {
-      type: String,
-      required: [true, "Vehicle model is required"],
-    },
-    manufacturingYear: {
-      type: Number,
-      required: [true, "Manufacturing year is required"],
-    },
-    registrationPlate: {
-      type: String,
-      required: [true, "Registration plate is required"],
-    },
+
+
   },
   { timestamps: true },
 );
