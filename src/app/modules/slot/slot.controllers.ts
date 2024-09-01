@@ -22,6 +22,7 @@ const createSlot = catchAsync(async (req, res) => {
 
 export const getAvailableSlots = catchAsync(async (req, res) => {
   const { date, serviceId } = req.query;
+  console.log(date,serviceId)
 
   if (!date || !serviceId) {
     res

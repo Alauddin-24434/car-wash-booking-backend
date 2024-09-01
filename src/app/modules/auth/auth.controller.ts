@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthServices } from "./auth.service";
 import config from "../../config";
+import AppError from "../../error/AppError";
 
 const loginUser = catchAsync(async (req, res) => {
   const loginData = await AuthServices.loginUser(req.body);
@@ -23,6 +24,36 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+
+const refreshToken = catchAsync(async (req, res) => {
+  const {refreshToken} = req.cookies;
+ 
+
+  if (!refreshToken) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Refresh token is required!');
+  }
+
+  const result = await AuthServices.refreshToken(refreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Access token is retrieved successfully!',
+    data: result,
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
 export const AuthControllers = {
   loginUser,
+  refreshToken
 };

@@ -5,7 +5,7 @@ import { TLoginUser } from "./auth.interface";
 import AppError from "../../error/AppError";
 
 import config from "../../config";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
@@ -27,9 +27,6 @@ const loginUser = async (payload: TLoginUser) => {
     role: user.role,
   };
 
-  // const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-  //   expiresIn: "10d",
-  // });
 
   const accessToken = createToken(
     jwtPayload,
@@ -48,6 +45,54 @@ return { accessToken, refreshToken };
 
 };
 
+
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+
+  const { userId} = decoded;
+
+
+    // Check if the user exists
+    const user = await User.isUserExistsByCustomId(userId);
+
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
+    }
+  
+    // Check if the user is deleted
+    if (user.isDeleted) {
+      throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted!');
+    }
+  
+    // Check if the user is blocked
+    if (user.status === 'blocked') {
+      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
+    }
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken,
+  };
+};
+
+
+
+
+
+
+
+
 export const AuthServices = {
   loginUser,
+  refreshToken
 };
