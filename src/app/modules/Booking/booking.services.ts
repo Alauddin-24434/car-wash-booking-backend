@@ -7,22 +7,18 @@ import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 
-
 const createBookingServicesIntoDB = async (
   payload: TBooking,
-
 ) => {
   const session = await mongoose.startSession();
-
   session.startTransaction();
 
   try {
-    
-    const { slotId:id  } = payload;
+    const { slotId: id } = payload;
 
     // Check if the slot is available
     const slot = await Slot.findById(id).session(session);
-    
+
     if (!slot) {
       throw new AppError(httpStatus.NOT_FOUND, "Slot not found");
     }
@@ -35,7 +31,6 @@ const createBookingServicesIntoDB = async (
       ...payload,
     };
 
-  
     const [newBooking] = await Booking.create([bookingPayload], { session });
 
     // Update the slot to set isBooked to "booked"
@@ -51,13 +46,11 @@ const createBookingServicesIntoDB = async (
 
     // Populate the related fields
     const populatedBooking = await (
-      await (await newBooking.populate("customerId")).populate("serviceId")
+      await newBooking.populate("serviceId")
     ).populate("slotId");
 
-    // Destructure the populated fields
     const {
       _id,
-      customerId,
       serviceId,
       slotId,
       createdAt,
@@ -68,14 +61,12 @@ const createBookingServicesIntoDB = async (
     await session.commitTransaction();
     session.endSession();
 
-    // Construct the response data
     return {
       success: true,
       statusCode: 200,
       message: "Booking created successfully",
       data: {
         _id,
-        customerId,
         service: serviceId,
         slot: slotId,
         createdAt,
@@ -83,7 +74,6 @@ const createBookingServicesIntoDB = async (
       },
     };
   } catch (error) {
-    // Rollback the transaction if any error occurs
     await session.abortTransaction();
     session.endSession();
     throw error;
@@ -91,17 +81,12 @@ const createBookingServicesIntoDB = async (
 };
 
 const getAllBookingIntoDB = async () => {
-  // Fetch all bookings and populate related fields
-
   const bookings = await Booking.find()
-    .populate("customerId")
     .populate("serviceId")
     .populate("slotId");
 
-  // Map each booking to extract necessary data
   const formattedBookings = bookings.map((booking) => ({
     _id: booking._id,
-    customer: booking?.customerId,
     service: booking.serviceId,
     slot: booking.slotId,
     createdAt: booking.createdAt,
@@ -112,31 +97,18 @@ const getAllBookingIntoDB = async () => {
 };
 
 const getBookingsByUserId = async (token: string) => {
-  try {
-    // Check if the given token is valid
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string,
-    ) as JwtPayload;
-    const { userId } = decoded;
+  // Assuming the token is valid and contains a user ID
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+  const { userId } = decoded;
 
-    // Query to fetch bookings associated with a user
-    const userBookings = await Booking.find({ customerId: userId })
-      .populate("customerId")
-      .populate("serviceId")
-      .populate("slotId");
+  const userBookings = await Booking.find({ userId })
+    .populate("serviceId")
+    .populate("slotId");
 
-    return userBookings;
-  } catch (error) {
-    // Log the error for debugging purposes
-    // console.error('Error fetching bookings:', error);
-
-    // Throw a new error with a message and status code
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Failed to fetch bookings for user",
-    );
-  }
+  return userBookings;
 };
 
 export const services = {

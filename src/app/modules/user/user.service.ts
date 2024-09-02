@@ -6,10 +6,22 @@ const createUserIntoDB = async (payload: TUser) => {
   return newUser;
 };
 
-const loginUserIntoDB = async (email: string) => {
-  // Find the user by email
-  const user = await User.findOne({ email });
-  return user;
-};
 
-export const userServices = { createUserIntoDB, loginUserIntoDB };
+
+
+
+
+const getUserById= async (id: string) => {
+  // Find the user by email
+  const user = await User.findById(id)
+  return user;
+}
+
+
+
+
+
+
+
+
+export const userServices = { createUserIntoDB, getUserById };

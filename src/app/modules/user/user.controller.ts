@@ -18,9 +18,24 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
+// get user by id
+const getUserById = catchAsync(async (req, res) => {
+const id= req.params.id;
+console.log(id)
+  const result = await userServices.getUserById(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User is find successfully",
+    data: result,
+  });
+});
+
 
 
 export const userControllers = {
   createUser,
+  getUserById
 
 };

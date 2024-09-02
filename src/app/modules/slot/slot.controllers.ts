@@ -45,7 +45,36 @@ export const getAvailableSlots = catchAsync(async (req, res) => {
   });
 });
 
+
+const getAllSlots = catchAsync(async (req, res) => {
+  const result = await services.getAllSlotsIntoDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Slots retrieved successfully",
+    data: result,
+  });
+});
+
+
+const toggleSlotStatus = catchAsync(async (req, res) => {
+  const { slotId } = req.params;
+
+  const result = await services.toggleSlotStatusInDB(slotId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Slot status updated successfully",
+    data: result,
+  });
+});
+
+
 export const slotControllers = {
   createSlot,
   getAvailableSlots,
+  getAllSlots,
+  toggleSlotStatus
 };

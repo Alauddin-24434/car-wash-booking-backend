@@ -3,9 +3,13 @@ import { TBooking } from "./booking.interface";
 
 const bookingSchema = new Schema<TBooking>(
   {
-    customerId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    name:{
+      type:String,
+      required: [true, "Name is required"],
+    },
+    email:{
+      type:String,
+      required: [true, "Email is required"],
     },
     serviceId: {
       type: Schema.Types.ObjectId,
@@ -17,7 +21,12 @@ const bookingSchema = new Schema<TBooking>(
       ref: "Slot",
       required: [true, "Slot ID is required"],
     },
-
+    
+    status: {
+      type:String,
+      enum: ['upcoming' , 'past'],
+      default: "upcoming",
+    }
 
   },
   { timestamps: true },

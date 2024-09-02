@@ -47,7 +47,34 @@ export const getAvilabeSlotIntoDB = async (serviceId: string, date: string) => {
   return slots;
 };
 
+const getAllSlotsIntoDB = async () => {
+  // date 2024-09-01
+  const services = await Slot.find({ isDeleted: { $ne: true } }).populate("service",);
+  return services;
+};
+const toggleSlotStatusInDB = async (slotId: string) => {
+  const slot = await Slot.findById(slotId);
+
+  if (!slot) {
+    throw new AppError(httpStatus.NOT_FOUND, "Slot not found!");
+  }
+
+  if (slot.isBooked === "booked") {
+    throw new AppError(httpStatus.BAD_REQUEST, "Cannot update the status of a booked slot.");
+  }
+
+  // Toggle the status between available and canceled
+  slot.isBooked = slot.isBooked === "available" ? "canceled" : "available";
+  await slot.save();
+
+  return slot;
+};
+
+
+
 export const services = {
   createSlotServicesIntoDB,
   getAvilabeSlotIntoDB,
+  getAllSlotsIntoDB,
+  toggleSlotStatusInDB 
 };

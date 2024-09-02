@@ -11,8 +11,12 @@ router.post(
   userControllers.createUser,
 );
 
-// user login route
+router.get(
+  "/user/:id",
+ 
+  userControllers.getUserById,
+);
 
-// router.post('/auth/login' ,userControllers.loginUser)
+
 
 export const userRoutes = router;

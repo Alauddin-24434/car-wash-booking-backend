@@ -9,11 +9,18 @@ const router = express.Router();
 
 router.post(
   "/slots",
-  // authValidation("admin"),
+  authValidation("admin"),
   validateRequest(slotzodValidations.slotZodValidationSchema),
   slotControllers.createSlot,
 );
 
+
 router.get("/slots/availability", slotControllers.getAvailableSlots);
+router.get("/slots", authValidation("admin"), slotControllers.getAllSlots);
+router.patch(
+  "/slots/:slotId/status",
+  authValidation("admin"),
+  slotControllers.toggleSlotStatus
+);
 
 export const SlotRoutes = router;

@@ -17,7 +17,6 @@ const createService = catchAsync(async (req, res) => {
   });
 });
 
-// Create service
 const getAllServices = catchAsync(async (req, res) => {
   const result = await services.getAllServicesIntoDB();
 

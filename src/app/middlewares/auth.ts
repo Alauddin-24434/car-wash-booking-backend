@@ -18,7 +18,7 @@ const authValidation = (...requiredRoles: TUserRole[]) => {
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
-
+console.log(token)
     let decoded;
 
     try {
@@ -34,7 +34,7 @@ const authValidation = (...requiredRoles: TUserRole[]) => {
 
     const { role, userId, } = decoded;
    
-
+console.log(role)
     // Check if the user exists
     const user = await User.isUserExistsByCustomId(userId);
 
