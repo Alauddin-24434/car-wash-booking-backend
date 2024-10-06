@@ -28,7 +28,6 @@ const createService = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
-// Create service
 const getAllServices = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield service_services_1.services.getAllServicesIntoDB();
     (0, sendResponse_1.default)(res, {

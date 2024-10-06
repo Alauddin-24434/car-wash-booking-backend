@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Model } from "mongoose";
+import { Model, Schema } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
 export interface TUser {
@@ -10,6 +10,7 @@ export interface TUser {
   phone: string;
   role: "admin" | "user";
   address: string;
+  image?: string;
   isDeleted: boolean;
 }
 
@@ -26,3 +27,13 @@ export interface UserModel extends Model<TUser> {
 }
 
 export type TUserRole = keyof typeof USER_ROLE;
+
+
+
+export type TUpdateUser={
+
+  name:string;
+  phone:string;
+  address:string;
+ 
+ }

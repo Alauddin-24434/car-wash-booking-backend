@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
-import { model, Schema } from "mongoose";
-import { TUser, UserModel } from "./user.interface";
+import { model, Schema, Types } from "mongoose";
+import { TUpdateUser, TUser, UserModel } from "./user.interface";
 import bcrypt from "bcrypt";
 import config from "../../config";
 import AppError from "../../error/AppError";
@@ -33,11 +33,14 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       required: [true, "Address is required"],
     },
-    isDeleted:{
-      type:Boolean,
-      default:false
-    }
-
+    image: {
+      type: String,
+      default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -53,7 +56,7 @@ const userSchema = new Schema<TUser, UserModel>(
         return ret;
       },
     },
-  },
+  }
 );
 
 userSchema.pre("save", async function (next) {
@@ -61,7 +64,7 @@ userSchema.pre("save", async function (next) {
   if (isUserEmailExist) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "This email is already exist!",
+      "This email is already exist!"
     );
   }
   next();
@@ -73,7 +76,7 @@ userSchema.pre("save", async function (next) {
   if (user.isModified("password")) {
     user.password = await bcrypt.hash(
       user.password,
-      Number(config.bcrypt_salt_rounds),
+      Number(config.bcrypt_salt_rounds)
     );
   }
   next();
@@ -83,14 +86,14 @@ userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await User.findOne({ email });
 };
 userSchema.statics.isUserExistsByCustomId = async function (id: string) {
-  return await User.findById(id)
-  
+  return await User.findById(id);
 };
 userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
-  hashedPassword,
+  hashedPassword
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
 export const User = model<TUser, UserModel>("User", userSchema);
+

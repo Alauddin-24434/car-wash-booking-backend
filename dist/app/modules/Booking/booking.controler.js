@@ -38,9 +38,9 @@ const getAllBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
 }));
 const getMyBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
-    const userBookings = yield booking_services_1.services.getBookingsByUserId(token);
+    const userId = req.params.id;
+    console.log(userId);
+    const userBookings = yield booking_services_1.services.getBookingsByUserId(userId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

@@ -32,13 +32,37 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         userId: user === null || user === void 0 ? void 0 : user.id,
         role: user.role,
     };
-    // const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    //   expiresIn: "10d",
-    // });
     const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
     const refreshToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_refresh_secret, config_1.default.jwt_refresh_expires_in);
     return { accessToken, refreshToken };
 });
+const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    // checking if the given token is valid
+    const decoded = (0, auth_utils_1.verifyToken)(token, config_1.default.jwt_refresh_secret);
+    const { userId } = decoded;
+    // Check if the user exists
+    const user = yield user_model_1.User.isUserExistsByCustomId(userId);
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'This user is not found!');
+    }
+    // Check if the user is deleted
+    if (user.isDeleted) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is deleted!');
+    }
+    // Check if the user is blocked
+    if (user.status === 'blocked') {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is blocked!');
+    }
+    const jwtPayload = {
+        userId: user.id,
+        role: user.role,
+    };
+    const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    return {
+        accessToken,
+    };
+});
 exports.AuthServices = {
     loginUser,
+    refreshToken
 };

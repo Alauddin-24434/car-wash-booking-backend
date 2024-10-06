@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post(
   "/bookings",
-  // authValidation("user"),
-  validateRequest(bookingzodValiditions.zodbookingSchema),
+  authValidation("user"),
+  // validateRequest(bookingzodValiditions.zodbookingSchema),
   BookingControllers.createBooking,
 );
 
@@ -20,7 +20,7 @@ router.get(
   BookingControllers.getAllBooking,
 );
 router.get(
-  "/my-bookings",
+  "/my-bookings/:id",
   authValidation("user"),
   BookingControllers.getMyBookings,
 );

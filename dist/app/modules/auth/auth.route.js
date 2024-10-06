@@ -10,4 +10,7 @@ const validateTequest_1 = __importDefault(require("../../middlewares/validateTeq
 const auth_controller_1 = require("./auth.controller");
 const router = express_1.default.Router();
 router.post("/auth/login", (0, validateTequest_1.default)(auth_zodValidation_1.AuthValidation.loginValidationSchema), auth_controller_1.AuthControllers.loginUser);
+router.post('/auth/refresh-token', 
+// validateRequest(AuthValidation.refreshTokenValidationSchema),
+auth_controller_1.AuthControllers.refreshToken);
 exports.AuthRoutes = router;

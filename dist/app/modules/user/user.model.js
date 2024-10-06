@@ -45,10 +45,14 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: [true, "Address is required"],
     },
+    image: {
+        type: String,
+        default: null,
+    },
     isDeleted: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 }, {
     timestamps: true,
     toJSON: {

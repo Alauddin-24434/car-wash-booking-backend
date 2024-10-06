@@ -1,10 +1,26 @@
-export type TBooking = {
-  
-  name:string;
-  email:string;
+export type TBookingService = {
   serviceId: object;
+  serviceName: string;
   slotId: object;
-  status: 'upcoming' | 'past';
-  createdAt?: Date;
-  updatedAt?: Date;
+  status: "upcoming" | "past";
+  date: string;
+  startTime: string;
+  endTime: string;
+};
+export type TBookingUser = {
+
+};
+
+export type TBooking = {
+  userId:string;
+  name: string;
+  email: string;
+  phone: string;
+  status:"past" | "upcoming";
+  address: string;
+  paymentStatus:"pending"| "successful" | "paid" |"failed";
+  user: TBookingUser;
+  bookingService: TBookingService[];
+  totalPrice: number;
+  isDeleted: boolean;
 };

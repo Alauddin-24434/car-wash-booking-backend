@@ -31,12 +31,13 @@ const createSlot = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 }));
 exports.getAvailableSlots = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { date, serviceId } = req.query;
-    // if (!date || !serviceId) {
-    //   res
-    //     .status(400)
-    //     .json({ success: false, message: "Date and serviceId are required" });
-    //   return;
-    // }
+    console.log(date, serviceId);
+    if (!date || !serviceId) {
+        res
+            .status(400)
+            .json({ success: false, message: "Date and serviceId are required" });
+        return;
+    }
     const slots = yield slot_services_1.services.getAvilabeSlotIntoDB(serviceId, date);
     //  console.log(slots)
     (0, sendResponse_1.default)(res, {
@@ -46,7 +47,28 @@ exports.getAvailableSlots = (0, catchAsync_1.default)((req, res) => __awaiter(vo
         data: slots,
     });
 }));
+const getAllSlots = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield slot_services_1.services.getAllSlotsIntoDB();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Slots retrieved successfully",
+        data: result,
+    });
+}));
+const toggleSlotStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { slotId } = req.params;
+    const result = yield slot_services_1.services.toggleSlotStatusInDB(slotId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Slot status updated successfully",
+        data: result,
+    });
+}));
 exports.slotControllers = {
     createSlot,
     getAvailableSlots: exports.getAvailableSlots,
+    getAllSlots,
+    toggleSlotStatus
 };

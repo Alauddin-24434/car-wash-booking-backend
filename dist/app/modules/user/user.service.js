@@ -13,11 +13,59 @@ exports.userServices = void 0;
 const user_model_1 = require("./user.model");
 const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const newUser = yield user_model_1.User.create(payload);
+    console.log(newUser);
     return newUser;
 });
-const loginUserIntoDB = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     // Find the user by email
-    const user = yield user_model_1.User.findOne({ email });
+    const user = yield user_model_1.User.findById(id);
     return user;
 });
-exports.userServices = { createUserIntoDB, loginUserIntoDB };
+const getAllUsersIntoDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.find();
+    return user;
+});
+const updateUserRoleInDB = (userId, role) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(userId);
+    const user = yield user_model_1.User.findByIdAndUpdate(userId, { role }, { new: true } // Return the updated document
+    );
+    if (!user) {
+        throw new Error("User not found");
+    }
+    return user;
+});
+const updateUserDataThroughUser = (userId, userInfo) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Fetch the user from the database, including the password
+        const user = yield user_model_1.User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        // Retain the existing password
+        const existingPassword = user.password;
+        // Merge the provided `userInfo` with the existing password
+        const updatedUserData = Object.assign(Object.assign({}, userInfo), { password: existingPassword });
+        console.log("update", updatedUserData);
+        // Perform the update
+        const result = yield user_model_1.User.updateOne({ _id: userId }, updatedUserData);
+        console.log("result", result);
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+            return result;
+        }
+        else {
+            throw new Error('No changes made to the user data');
+        }
+    }
+    catch (error) {
+        console.error('Error updating user:', error);
+        throw new Error(error.message || 'An error occurred while updating the user');
+    }
+});
+exports.userServices = {
+    createUserIntoDB,
+    getUserById,
+    updateUserDataThroughUser,
+    getAllUsersIntoDB,
+    updateUserRoleInDB, // Export the new service function
+};

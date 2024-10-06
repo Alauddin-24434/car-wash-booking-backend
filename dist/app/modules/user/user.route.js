@@ -6,10 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRoutes = void 0;
 const express_1 = __importDefault(require("express"));
 const user_controller_1 = require("./user.controller");
-const user_zodValidition_1 = require("./user.zodValidition");
-const validateTequest_1 = __importDefault(require("../../middlewares/validateTequest"));
+const auth_1 = __importDefault(require("../../middlewares/auth"));
 const router = express_1.default.Router();
-router.post("/auth/signup", (0, validateTequest_1.default)(user_zodValidition_1.zodUserValidations.zodUserValidationSchema), user_controller_1.userControllers.createUser);
-// user login route
-// router.post('/auth/login' ,userControllers.loginUser)
+router.post('/auth/signup', user_controller_1.userControllers.createUser);
+router.get("/user/:id", user_controller_1.userControllers.getUserById);
+router.get("/users", user_controller_1.userControllers.getAllUsers);
+router.put('/users/:id', (0, auth_1.default)('admin'), user_controller_1.userControllers.updateUserRole);
+router.put('/users/throughUser/:id', (0, auth_1.default)('user'), user_controller_1.userControllers.updateUserThroughUser);
 exports.userRoutes = router;

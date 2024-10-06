@@ -10,9 +10,7 @@ const validateTequest_1 = __importDefault(require("../../middlewares/validateTeq
 const service_zodValidation_1 = require("./service.zodValidation");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
 const router = express_1.default.Router();
-router.post("/services", 
-// authValidation("admin"),
-(0, validateTequest_1.default)(service_zodValidation_1.zodServiceValidations.serviceZodValidationSchema), service_controller_1.serviceControllers.createService);
+router.post("/services", (0, auth_1.default)("admin"), (0, validateTequest_1.default)(service_zodValidation_1.zodServiceValidations.serviceZodValidationSchema), service_controller_1.serviceControllers.createService);
 router.get("/services", service_controller_1.serviceControllers.getAllServices);
 router.get("/services/:id", service_controller_1.serviceControllers.getSingleService);
 //Update Services (Only Accessible by Admin)

@@ -18,6 +18,7 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const auth_service_1 = require("./auth.service");
 const config_1 = __importDefault(require("../../config"));
+const AppError_1 = __importDefault(require("../../error/AppError"));
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginData = yield auth_service_1.AuthServices.loginUser(req.body);
     const { accessToken, refreshToken } = loginData;
@@ -32,6 +33,20 @@ const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         data: { accessToken },
     });
 }));
+const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Refresh token is required!');
+    }
+    const result = yield auth_service_1.AuthServices.refreshToken(refreshToken);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Access token is retrieved successfully!',
+        data: result,
+    });
+}));
 exports.AuthControllers = {
     loginUser,
+    refreshToken
 };

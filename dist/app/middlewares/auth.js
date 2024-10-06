@@ -18,35 +18,45 @@ const AppError_1 = __importDefault(require("../error/AppError"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config"));
 const user_model_1 = require("../modules/user/user.model");
+// Middleware function to validate authentication and authorization
 const authValidation = (...requiredRoles) => {
     return (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        // Extract the token from the Authorization header
         const token = req.headers.authorization;
-        // checking if the token is missing
+        // Check if the token is missing
         if (!token) {
-            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized!');
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized!");
         }
-        // checking if the given token is valid
-        const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
-        const { role, userId } = decoded;
-        // checking if the user is exist
+        let decoded;
+        try {
+            // Verify the token
+            decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
+        }
+        catch (err) {
+            // Token is invalid or expired
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "Unauthorized");
+        }
+        const { role, userId, } = decoded;
+        // Check if the user exists
         const user = yield user_model_1.User.isUserExistsByCustomId(userId);
         if (!user) {
-            throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'This user is not found !');
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found!");
         }
-        // checking if the user is already deleted
-        const isDeleted = user === null || user === void 0 ? void 0 : user.isDeleted;
-        if (isDeleted) {
-            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is deleted !');
+        // Check if the user is deleted
+        if (user.isDeleted) {
+            throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is deleted!");
         }
-        // checking if the user is blocked
-        const userStatus = user === null || user === void 0 ? void 0 : user.status;
-        if (userStatus === 'blocked') {
-            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'This user is blocked ! !');
+        // Check if the user is blocked
+        if (user.status === "blocked") {
+            throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is blocked!");
         }
-        if (requiredRoles && !requiredRoles.includes(role)) {
-            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized  hi!');
+        // Check if the user has the required role
+        if (requiredRoles.length && !requiredRoles.includes(role)) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized!");
         }
+        // Attach the user information to the request object
         req.user = decoded;
+        // Proceed to the next middleware or route handler
         next();
     }));
 };
