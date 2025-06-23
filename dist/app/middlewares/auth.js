@@ -46,10 +46,6 @@ const authValidation = (...requiredRoles) => {
         if (user.isDeleted) {
             throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is deleted!");
         }
-        // Check if the user is blocked
-        if (user.status === "blocked") {
-            throw new AppError_1.default(http_status_1.default.FORBIDDEN, "This user is blocked!");
-        }
         // Check if the user has the required role
         if (requiredRoles.length && !requiredRoles.includes(role)) {
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, "You are not authorized!");

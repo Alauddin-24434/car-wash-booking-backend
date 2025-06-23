@@ -27,7 +27,7 @@ const createBookingServicesIntoDB = async (payload: TBooking) => {
       );
     }
 
-    const { isDeleted, role, createdAt, updatedAt, __v, ...userData } =
+    const { isDeleted, role, ...userData } =
       findUserById.toObject<TUser>();
 
     let totalPrice = 0;

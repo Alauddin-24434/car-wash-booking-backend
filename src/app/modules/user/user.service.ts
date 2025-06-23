@@ -1,12 +1,6 @@
 import { TUpdateUser, TUser } from "./user.interface";
 import {  User } from "./user.model";
 
-const createUserIntoDB = async (payload: TUser) => {
-  const newUser = await User.create(payload);
-  console.log(newUser)
-  return newUser;
-};
-
 
 
 
@@ -85,7 +79,7 @@ console.log("result", result)
 
 
 export const userServices = {
-  createUserIntoDB,
+
   getUserById,
   updateUserDataThroughUser,
   getAllUsersIntoDB,

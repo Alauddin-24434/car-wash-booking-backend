@@ -13,9 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-/* eslint-disable @typescript-eslint/no-this-alias */
 const mongoose_1 = require("mongoose");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../error/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
@@ -39,7 +38,7 @@ const userSchema = new mongoose_1.Schema({
     role: {
         type: String,
         enum: ["user", "admin"],
-        required: [true, "Role is required"],
+        default: "user",
     },
     address: {
         type: String,
@@ -47,7 +46,7 @@ const userSchema = new mongoose_1.Schema({
     },
     image: {
         type: String,
-        default: null,
+        required: [true, "Image is required"],
     },
     isDeleted: {
         type: Boolean,
@@ -81,7 +80,7 @@ userSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
         if (user.isModified("password")) {
-            user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
+            user.password = yield bcryptjs_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
         }
         next();
     });
@@ -98,7 +97,7 @@ userSchema.statics.isUserExistsByCustomId = function (id) {
 };
 userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPassword) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield bcrypt_1.default.compare(plainTextPassword, hashedPassword);
+        return yield bcryptjs_1.default.compare(plainTextPassword, hashedPassword);
     });
 };
 exports.User = (0, mongoose_1.model)("User", userSchema);

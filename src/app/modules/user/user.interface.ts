@@ -3,20 +3,22 @@ import { Model, Schema } from "mongoose";
 import { USER_ROLE } from "./user.constant";
 
 export interface TUser {
-  [x: string]: any;
+  _id: string;
   name: string;
   email: string;
   password: string;
   phone: string;
   role: "admin" | "user";
   address: string;
-  image?: string;
+  image: string;
   isDeleted: boolean;
+  createdAt?: Date;  // add this
+  updatedAt?: Date;  // add this
 }
 
 export interface UserModel extends Model<TUser> {
-    //instance methods for checking if the user exist
-    isUserExistsByCustomId(id: string): Promise<TUser>;
+  //instance methods for checking if the user exist
+  isUserExistsByCustomId(id: string): Promise<TUser>;
   //instance methods for checking if the user exist
   isUserExistsByEmail(email: string): Promise<TUser>;
   //instance methods for checking if passwords are matched
@@ -30,10 +32,10 @@ export type TUserRole = keyof typeof USER_ROLE;
 
 
 
-export type TUpdateUser={
+export type TUpdateUser = {
 
-  name:string;
-  phone:string;
-  address:string;
- 
- }
+  name: string;
+  phone: string;
+  address: string;
+
+}

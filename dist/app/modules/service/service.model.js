@@ -33,8 +33,8 @@ const serviceSchema = new mongoose_1.Schema({
         type: Number,
         required: true,
     },
-    image: {
-        type: String,
+    images: {
+        type: [String], // array of strings
         required: true,
     },
     isDeleted: {

@@ -4,13 +4,14 @@ import { serviceControllers } from "./service.controller";
 import validateRequest from "../../middlewares/validateTequest";
 import { zodServiceValidations } from "./service.zodValidation";
 import authValidation from "../../middlewares/auth";
+import upload from "../../middlewares/multer/uploadMiddleware";
 
 const router = express.Router();
 
 router.post(
-  "/services",
-  authValidation("admin"),
-  validateRequest(zodServiceValidations.serviceZodValidationSchema),
+  "/service",
+  
+  upload.array("images",5),
   serviceControllers.createService,
 );
 
@@ -21,7 +22,7 @@ router.get("/services/:id", serviceControllers.getSingleService);
 
 router.put(
   "/services/:id",
-  authValidation("admin"),
+ 
   validateRequest(zodServiceValidations.updateServiceZodValidationSchema),
   serviceControllers.UpdateServiceById,
 );

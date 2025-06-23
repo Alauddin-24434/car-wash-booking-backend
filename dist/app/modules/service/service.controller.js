@@ -19,7 +19,10 @@ const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const service_services_1 = require("./service.services");
 // Create service
 const createService = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const serviceData = req.body;
+    var _a;
+    // req.files is an array of uploaded files
+    const imageUrls = ((_a = req.files) === null || _a === void 0 ? void 0 : _a.map(file => file.path)) || [];
+    const serviceData = Object.assign(Object.assign({}, req.body), { images: imageUrls });
     const result = yield service_services_1.services.createServiceServicesIntoDB(serviceData);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

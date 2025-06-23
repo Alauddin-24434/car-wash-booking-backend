@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
-import { model, Schema, Types } from "mongoose";
-import { TUpdateUser, TUser, UserModel } from "./user.interface";
-import bcrypt from "bcrypt";
+
+import { model, Schema, } from "mongoose";
+import { TUser, UserModel } from "./user.interface";
+import bcrypt from "bcryptjs";
 import config from "../../config";
 import AppError from "../../error/AppError";
 import httpStatus from "http-status";
@@ -27,7 +27,7 @@ const userSchema = new Schema<TUser, UserModel>(
     role: {
       type: String,
       enum: ["user", "admin"],
-      required: [true, "Role is required"],
+      default:"user",
     },
     address: {
       type: String,
@@ -35,7 +35,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     image: {
       type: String,
-      default: null,
+      required: [true, "Image is required"],
     },
     isDeleted: {
       type: Boolean,

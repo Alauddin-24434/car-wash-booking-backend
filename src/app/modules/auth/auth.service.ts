@@ -4,8 +4,23 @@ import { User } from "../user/user.model";
 import { TLoginUser } from "./auth.interface";
 import AppError from "../../error/AppError";
 
+import jwt from "jsonwebtoken";
+import { TUser } from "../user/user.interface";
 import config from "../../config";
-import { createToken, verifyToken } from "./auth.utils";
+
+
+
+
+const createUserIntoDB = async (payload: TUser) => {
+  const newUser = await User.create(payload);
+  return newUser;
+};
+
+
+
+
+
+
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
@@ -20,70 +35,32 @@ const loginUser = async (payload: TLoginUser) => {
   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, "Password do not matched");
 
-  // create a jwt token
-
-  const jwtPayload = {
-    userId: user?.id,
-    role: user.role,
-  };
-
-
-  const accessToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
-);
-
-const refreshToken = createToken(
-    jwtPayload,
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string
-);
-
-return { accessToken, refreshToken };
+  return user;
 
 
 };
 
 
-const refreshToken = async (token: string) => {
-  // checking if the given token is valid
-  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+const handleRefreshToken = async (refreshToken: string) => {
+  const decoded = jwt.verify(refreshToken, config.jwt_refresh_secret) as { id: string };
 
-  const { userId} = decoded;
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
 
-
-    // Check if the user exists
-    const user = await User.isUserExistsByCustomId(userId);
-
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
-    }
-  
-    // Check if the user is deleted
-    if (user.isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted!');
-    }
-  
-    // Check if the user is blocked
-    if (user.status === 'blocked') {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
-    }
-  const jwtPayload = {
-    userId: user.id,
-    role: user.role,
-  };
-
-  const accessToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string,
+  const newAccessToken = jwt.sign(
+    { id: user._id, role: user.role },
+    config.jwt_access_secret,
+    { expiresIn: "1h" }
   );
 
-  return {
-    accessToken,
-  };
+  return newAccessToken;
 };
+
+
+
+
 
 
 
@@ -96,5 +73,6 @@ const refreshToken = async (token: string) => {
 
 export const AuthServices = {
   loginUser,
-  refreshToken
+  handleRefreshToken,
+  createUserIntoDB
 };

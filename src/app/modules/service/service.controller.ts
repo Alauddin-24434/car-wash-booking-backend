@@ -5,7 +5,13 @@ import { services } from "./service.services";
 
 // Create service
 const createService = catchAsync(async (req, res) => {
-  const serviceData = req.body;
+  // req.files is an array of uploaded files
+  const imageUrls = (req.files as Express.Multer.File[] | undefined)?.map(file => file.path) || [];
+
+  const serviceData = {
+    ...req.body,
+    images: imageUrls,
+  };
 
   const result = await services.createServiceServicesIntoDB(serviceData);
 
@@ -16,6 +22,7 @@ const createService = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 
 const getAllServices = catchAsync(async (req, res) => {
   const result = await services.getAllServicesIntoDB();

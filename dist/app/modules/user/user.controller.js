@@ -17,18 +17,6 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const user_service_1 = require("./user.service");
-// Create user
-const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const bodyData = req.body;
-    // Attach the userImage to the request body if it exists
-    const result = yield user_service_1.userServices.createUserIntoDB(bodyData);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'User is created successfully',
-        data: result,
-    });
-}));
 // get user by id
 const getUserById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -75,7 +63,6 @@ const updateUserThroughUser = (0, catchAsync_1.default)((req, res) => __awaiter(
     });
 }));
 exports.userControllers = {
-    createUser,
     getUserById,
     updateUserThroughUser,
     getAllUsers,

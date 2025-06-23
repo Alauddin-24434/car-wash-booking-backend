@@ -2,8 +2,13 @@ import express from "express";
 import { AuthValidation } from "./auth.zodValidation";
 import validateRequest from "../../middlewares/validateTequest";
 import { AuthControllers } from "./auth.controller";
+import upload from "../../middlewares/multer/uploadMiddleware";
 
 const router = express.Router();
+
+
+router.post('/auth/signup', upload.single("image"),  AuthControllers.createUser );
+
 
 router.post(
   "/auth/login",
@@ -23,7 +28,7 @@ router.post(
 
   // validateRequest(AuthValidation.refreshTokenValidationSchema),
 
-  AuthControllers.refreshToken,
+  AuthControllers.refreshAccessToken,
 );
 
 

@@ -43,7 +43,7 @@ const createBookingServicesIntoDB = (payload) => __awaiter(void 0, void 0, void 
         if (!findUserById) {
             throw new AppError_1.default(http_status_1.default.NOT_FOUND, `User with ID ${userId} not found`);
         }
-        const _a = findUserById.toObject(), { isDeleted, role, createdAt, updatedAt, __v } = _a, userData = __rest(_a, ["isDeleted", "role", "createdAt", "updatedAt", "__v"]);
+        const _a = findUserById.toObject(), { isDeleted, role } = _a, userData = __rest(_a, ["isDeleted", "role"]);
         let totalPrice = 0;
         // Extract slot IDs from bookingServiceMap
         const slotIds = bookingServiceMap.map((item) => item.slotId);

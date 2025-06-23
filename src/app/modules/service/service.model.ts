@@ -21,10 +21,11 @@ const serviceSchema = new Schema<TService>(
       type: Number,
       required: true,
     },
-    image: {
-      type:String,
-      required: true,
-    },
+  images: {
+  type: [String], // array of strings
+  required: true,
+},
+
     isDeleted: {
       type: Boolean,
       default: false,
