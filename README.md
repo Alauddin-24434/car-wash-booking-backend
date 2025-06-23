@@ -1,7 +1,7 @@
 # Car-Wash-Booking-System-mui
 
 
-Live URL: https://car-wash-booking-system-liard.vercel.app
+
 
 # Key Features:
 User Registration and Login:
@@ -28,44 +28,80 @@ Users can update their personal information and manage their profile.
 
 ## Installation and Setup
 
-### Prerequisites
+CLOUDINARY_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+STRIPE_SECRET_KEY=
+SUCCESS_URL=http://localhost/api/verify-payment
+FAIL_URL=http://localhost/api/payment/fail
+CANCEL_URL=http://localhost/api/payment/cancel
+```
 
-- Node.js (version x.x.x)
-- MongoDB (if applicable)
+> **Note:** Replace the values with your actual credentials before running the project.
 
-### Installation
+---
 
-1. Clone the repository.
-<pre>
-   https://github.com/Alauddin-24434/Car-Wash-Booking-System.git
-</pre>
+## 🛠 Getting Started
 
-2. Navigate to the project directory.
+### 1. Clone the Repository
 
-<pre>
-     cd Car-Wash-Booking-System
-</pre>
+```bash
+git clone https://github.com/Alauddin-24434/royal-place-backend.git
+cd royal-place-backend
+```
+
+### 2. Install Dependencies
+
+This project uses [pnpm](https://pnpm.io/) (recommended), but you can use npm if needed.
+
+#### Using pnpm (recommended):
+
+```bash
+pnpm install
+```
+
+#### Using npm:
+
+1. **Delete the pnpm lockfile first:**
+    ```bash
+    rm -rf pnpm-lock.yaml
+    ```
+2. **Then install dependencies:**
+    ```bash
+    npm install
+    ```
+
+> **Warning:** Do **not** mix pnpm and npm in the same project.
+
+---
+
+## 🚀 Running the Project
+
+### Development
+
+```bash
+pnpm run dev
+# or
+npm run dev
+```
+
+### Production
+
+```bash
+pnpm run build && pnpm start
+# or
+npm run build && npm start
+```
 
 
-3.Install dependencies.
+---
 
-<pre>
-     npm install
-</pre>
+## 🤝 Contributing
 
+Contributions are welcome! Please open issues or submit pull requests for improvements and bug fixes.
 
-4. .env file dependencies.
-   <pre>
-      NODE_ENV=development
-      PORT=5000
-      DATABASE_URL=your mongodb url
-      BCRYPT_SALT_ROUNDS=12
-      DEFAULT_PASS=phuniversity!@#
-      ZWT_ACCESS_SECRET=b1bd3f9120550679135e8c284f574e3cc32203aeb393ad8bb306c55a3ff1aaed
+---
 
-   </pre> 
+## 📫 Contact
 
-   5. localhost server 5000 run 
-      <pre>
-         npm run start:dev
-      </pre>
+For questions or support, please contact [alauddin150900@gmail.com].

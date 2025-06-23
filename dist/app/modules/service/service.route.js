@@ -8,7 +8,7 @@ const express_1 = __importDefault(require("express"));
 const service_controller_1 = require("./service.controller");
 const validateTequest_1 = __importDefault(require("../../middlewares/validateTequest"));
 const service_zodValidation_1 = require("./service.zodValidation");
-const auth_1 = __importDefault(require("../../middlewares/auth"));
+// import authValidation from "../../middlewares/auth";
 const uploadMiddleware_1 = __importDefault(require("../../middlewares/multer/uploadMiddleware"));
 const router = express_1.default.Router();
 router.post("/service", uploadMiddleware_1.default.array("images", 5), service_controller_1.serviceControllers.createService);
@@ -17,5 +17,5 @@ router.get("/services/:id", service_controller_1.serviceControllers.getSingleSer
 //Update Services (Only Accessible by Admin)
 router.put("/services/:id", (0, validateTequest_1.default)(service_zodValidation_1.zodServiceValidations.updateServiceZodValidationSchema), service_controller_1.serviceControllers.UpdateServiceById);
 // delete service
-router.delete("/services/:id", (0, auth_1.default)("admin"), service_controller_1.serviceControllers.deletedServiceById);
+router.delete("/services/:id", service_controller_1.serviceControllers.deletedServiceById);
 exports.ServicesRoutes = router;
