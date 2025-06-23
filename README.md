@@ -28,13 +28,30 @@ Users can update their personal information and manage their profile.
 
 ## Installation and Setup
 
-CLOUDINARY_NAME=
+# Server Configuration
+PORT=
+NODE_ENV=
+
+# Database Configuration
+DATABASE_URL=
+
+# Security
+BCRYPT_SALT_ROUNDS=
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+
+# AamarPay Configuration
+AAMARPAY_STORE_ID=
+AAMARPAY_SIGNATURE_KEY=
+SUCCESS_URL=
+FAIL_URL=
+CANCEL_URL=
+
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
-STRIPE_SECRET_KEY=
-SUCCESS_URL=http://localhost/api/verify-payment
-FAIL_URL=http://localhost/api/payment/fail
-CANCEL_URL=http://localhost/api/payment/cancel
+
 ```
 
 > **Note:** Replace the values with your actual credentials before running the project.
