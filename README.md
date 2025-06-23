@@ -63,8 +63,8 @@ CLOUDINARY_API_SECRET=
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Alauddin-24434/royal-place-backend.git
-cd royal-place-backend
+git clone https://github.com/Alauddin-24434/car-wash-booking-backend.git
+cd car-wash-booking-backend
 ```
 
 ### 2. Install Dependencies

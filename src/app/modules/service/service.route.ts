@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/service",
   
-  upload.array("images",5),
+  upload.single("iamge"),
   serviceControllers.createService,
 );
 

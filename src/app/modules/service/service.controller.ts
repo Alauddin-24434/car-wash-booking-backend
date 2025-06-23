@@ -6,11 +6,11 @@ import { services } from "./service.services";
 // Create service
 const createService = catchAsync(async (req, res) => {
   // req.files is an array of uploaded files
-  const imageUrls = (req.files as Express.Multer.File[] | undefined)?.map(file => file.path) || [];
+  const imageUrl = req.file?.path;
 
   const serviceData = {
     ...req.body,
-    images: imageUrls,
+    image: imageUrl,
   };
 
   const result = await services.createServiceServicesIntoDB(serviceData);

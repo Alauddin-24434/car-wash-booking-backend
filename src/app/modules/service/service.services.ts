@@ -1,7 +1,8 @@
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
-import { TService } from "./service.interface";
+
 import { Service } from "./service.model";
+import { IService } from "./service.interface";
 
 // Helper function to find a service by ID and check if it exists and is not soft-deleted
 const findService = async (id: string) => {
@@ -13,7 +14,7 @@ const findService = async (id: string) => {
 };
 
 // Create a new service in the database
-const createServiceServicesIntoDB = async (payload: TService) => {
+const createServiceServicesIntoDB = async (payload: IService) => {
   const service = await Service.create(payload);
   return service;
 };
@@ -30,7 +31,7 @@ const getSingleServiceIntoDB = async (id: string) => {
 };
 
 // Update a service by ID in the database
-const updateServicesIntoDB = async (id: string, payload: TService) => {
+const updateServicesIntoDB = async (id: string, payload: IService) => {
   await findService(id); // Ensure the service exists before updating
   const updatedService = await Service.updateOne({ _id: id }, payload);
   if (updatedService.modifiedCount) {

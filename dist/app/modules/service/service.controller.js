@@ -21,8 +21,8 @@ const service_services_1 = require("./service.services");
 const createService = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     // req.files is an array of uploaded files
-    const imageUrls = ((_a = req.files) === null || _a === void 0 ? void 0 : _a.map(file => file.path)) || [];
-    const serviceData = Object.assign(Object.assign({}, req.body), { images: imageUrls });
+    const imageUrl = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
+    const serviceData = Object.assign(Object.assign({}, req.body), { image: imageUrl });
     const result = yield service_services_1.services.createServiceServicesIntoDB(serviceData);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

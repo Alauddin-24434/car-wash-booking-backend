@@ -11,7 +11,7 @@ const service_zodValidation_1 = require("./service.zodValidation");
 // import authValidation from "../../middlewares/auth";
 const uploadMiddleware_1 = __importDefault(require("../../middlewares/multer/uploadMiddleware"));
 const router = express_1.default.Router();
-router.post("/service", uploadMiddleware_1.default.array("images", 5), service_controller_1.serviceControllers.createService);
+router.post("/service", uploadMiddleware_1.default.single("iamge"), service_controller_1.serviceControllers.createService);
 router.get("/services", service_controller_1.serviceControllers.getAllServices);
 router.get("/services/:id", service_controller_1.serviceControllers.getSingleService);
 //Update Services (Only Accessible by Admin)
