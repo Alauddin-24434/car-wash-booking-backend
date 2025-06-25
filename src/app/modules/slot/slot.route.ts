@@ -1,26 +1,28 @@
 import express from "express";
-import { slotControllers } from "./slot.controllers";
+import { createSlots, deleteSlot, getSingleSlot, getSlots, updateSlot } from "./slot.controllers";
 
-import { slotzodValidations } from "./slot.zodValidation";
-import validateRequest from "../../middlewares/validateTequest";
-// import authValidation from "../../middlewares/auth";
 
 const router = express.Router();
 
+// Create slot - serviceId param in URL, validation middleware enabled
 router.post(
-  "/slots",
-
-  validateRequest(slotzodValidations.slotZodValidationSchema),
-  slotControllers.createSlot,
+  "/slot",
+  createSlots
 );
 
+// Get all slots
+router.get("/slots", getSlots);
 
-router.get("/slots/availability", slotControllers.getAvailableSlots);
-router.get("/slots",  slotControllers.getAllSlots);
-router.patch(
-  "/slots/:slotId/status",
-  
-  slotControllers.toggleSlotStatus
+// (Optional) Get single slot by ID
+router.get("/slot/:id", getSingleSlot);
+
+// (Optional) Update slot by ID
+router.put(
+  "/slot/:id",
+  updateSlot
 );
+
+// (Optional) Delete slot by ID
+router.delete("/slot/:id", deleteSlot);
 
 export const SlotRoutes = router;

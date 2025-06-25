@@ -1,50 +1,54 @@
-import httpStatus from "http-status";
+// src/controllers/booking.controller.ts
+
+import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
-import { services } from "./booking.services";
-import sendResponse from "../../utils/sendResponse";
+import { Booking } from "./booking.model";
 
-const createBooking = catchAsync(async (req, res) => {
-  const bookingData = req.body;
-  // const token= req.headers.authorization;
+// POST /api/bookings
+export const createBooking = catchAsync(async (req: Request, res: Response) => {
+  const booking = await Booking.create(req.body);
 
-  const createdBooking = await services.createBookingServicesIntoDB(
-    bookingData,
-    // token as string,
-  );
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+  res.status(201).json({
     success: true,
-    message: "Booking successful",
-    data: createdBooking,
+    message: "Booking created successfully",
+    data: booking,
   });
 });
 
-const getAllBooking = catchAsync(async (req, res) => {
-  const findBooking = await services.getAllBookingIntoDB();
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+// GET /api/bookings
+export const getAllBookings = catchAsync(async (_req: Request, res: Response) => {
+  const bookings = await Booking.find()
+    .populate("userId", "name email")
+    .populate("serviceId", "name price")
+    .populate("slotId");
+
+  res.status(200).json({
     success: true,
-    message: "All bookings retrieved successfully",
-    data: findBooking,
+    data: bookings,
   });
 });
 
-const getMyBookings = catchAsync(async (req, res) => {
- const userId= req.params.id;
- console.log(userId)
-  const userBookings = await services.getBookingsByUserId(userId);
+// GET /api/bookings/:id
+export const getBookingById = catchAsync(async (req: Request, res: Response) => {
+  const booking = await Booking.findById(req.params.id)
+    .populate("userId", "name email")
+    .populate("serviceId", "name")
+    .populate("slotId");
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+  if (!booking) {
+    res.status(404);
+    throw new Error("Booking not found");
+  }
+
+  res.status(200).json({
     success: true,
-    message: "User bookings retrieved successfully",
-    data: userBookings,
+    data: booking,
   });
 });
 
-export const BookingControllers = {
+
+export const bookingController={
   createBooking,
-  getAllBooking,
-  getMyBookings,
-};
+  getAllBookings,
+  getBookingById
+}

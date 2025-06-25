@@ -1,26 +1,12 @@
 import express from "express";
-import { BookingControllers } from "./booking.controler";
-
+import { bookingController, createBooking, getAllBookings } from "./booking.controler";
 
 const router = express.Router();
 
-router.post(
-  "/bookings",
- 
-  // validateRequest(bookingzodValiditions.zodbookingSchema),
-  BookingControllers.createBooking,
-);
+router.post("/bookings", bookingController.createBooking);
 
 // get all booking
-router.get(
-  "/bookings",
-
-  BookingControllers.getAllBooking,
-);
-router.get(
-  "/my-bookings/:id",
-
-  BookingControllers.getMyBookings,
-);
+router.get("/bookings", bookingController.getAllBookings);
+router.get("/bookings/:id",bookingController.getBookingById);
 
 export const BookingRoutes = router;

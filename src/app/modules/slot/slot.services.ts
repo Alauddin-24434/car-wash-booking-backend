@@ -1,80 +1,146 @@
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
-import { TSlot } from "./slot.interface";
+import { ISlot, ISlotQueryParams } from "./slot.interface";
+import { Types } from "mongoose";
 import { Slot } from "./slot.model";
-import { formatMinutesToTime, parseTimeToMinutes } from "./slot.utils";
+import type { SortOrder } from "mongoose";
 
-const createSlotServicesIntoDB = async (payload: TSlot, duration: number) => {
-  const { service, date, startTime, endTime } = payload;
+// Create slot(s), recurring logic included
+const createSlotsIntoDB = async (payload: ISlot & { repeatDays?: number; blockedDates?: string[] }) => {
+  const {
+    date,
+    startTime,
+    endTime,
+    duration,
+    capacity,
+    
+    serviceId,
+    recurring = false,
+    repeatDays = 0,
+    blockedDates = [],
+  } = payload;
 
-  const slotsArry: TSlot[] = [];
+  // Friday (day 5) and blockedDates skip করব
+  const isDateBlocked = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.getDay() === 5 || blockedDates.includes(dateStr);
+  };
 
-  const startMinutes = parseTimeToMinutes(startTime);
-  const endMinutes = parseTimeToMinutes(endTime);
+  const slotsToCreate: ISlot[] = [];
 
-  for (let time = startMinutes; time < endMinutes; time += duration) {
-    const slot: TSlot = {
-      service,
-      date,
-      startTime: formatMinutesToTime(time),
-      endTime: formatMinutesToTime(time + duration),
-      isBooked: "available",
-    };
-    const createSlot = await Slot.create(slot);
-    slotsArry.push(createSlot);
+  if (recurring && repeatDays > 0) {
+    const startDate = new Date(date);
+    for (let i = 0; i < repeatDays; i++) {
+      const nextDate = new Date(startDate);
+      nextDate.setDate(startDate.getDate() + i);
+      const nextDateStr = nextDate.toISOString().split("T")[0];
+      if (isDateBlocked(nextDateStr)) continue;
+
+      slotsToCreate.push({
+        date: nextDateStr,
+        startTime,
+        endTime,
+        duration,
+        capacity,
+        booked: 0,
+        available: capacity,
+        status: "available",
+        serviceId: new Types.ObjectId(serviceId),
+        recurring,
+        blockedDates,
+      });
+    }
+  } else {
+    if (!isDateBlocked(date)) {
+      slotsToCreate.push({
+        date,
+        startTime,
+        endTime,
+        duration,
+        capacity,
+        booked: 0,
+        available: capacity,
+        status: "available",
+    
+        serviceId: new Types.ObjectId(serviceId),
+        recurring,
+        blockedDates,
+      });
+    } else {
+      throw new AppError(httpStatus.BAD_REQUEST, "Slot date is blocked or on Friday");
+    }
   }
 
-  return slotsArry;
+  const createdSlots = await Slot.insertMany(slotsToCreate);
+  return createdSlots;
 };
 
-//  Get available slots
+// Get slots with optional filters (date, serviceId, availability)
+const getSlotsFromDB = async (params: ISlotQueryParams) => {
+  const {
+    date,
+    serviceId,
+    status,
+    availability,
+    limit = 10,
+    page = 1,
+    sort = "date",
+  } = params;
+  const skip = (page - 1) * limit;
+  const filters: any = {};
 
-export const getAvilabeSlotIntoDB = async (serviceId: string, date: string) => {
+  if (date) filters.date = date;
+  if (serviceId) filters.serviceId = serviceId;
+  if (status) filters.status = status;
 
-  console.log(serviceId,date)
-  
-  
- 
-  // Find slots in the database by service ID and date, and populate the service field with service details
-  const slots = await Slot.find({  date ,service: serviceId}).populate(
-    "service",
-  );
-  //  console.log(slots)
-  if (!slots || slots.length === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, "Slots not found!");
+  if (availability !== undefined) {
+    filters.available = availability ? { $gt: 0 } : { $eq: 0 };
   }
 
-  return slots;
+  // Sort options fix for TypeScript
+  const sortOptions: { [key: string]: SortOrder } = sort === "date"
+    ? { date: 1, startTime: 1 }
+    : { [sort]: 1 };
+
+  const slots = await Slot.find(filters).sort(sortOptions).skip(skip).limit(limit);
+  const total = await Slot.countDocuments(filters);
+
+  return { slots, meta: { total, page, limit } };
 };
 
-const getAllSlotsIntoDB = async () => {
-  // date 2024-09-01
-  const services = await Slot.find({ isDeleted: { $ne: true } }).populate("service",);
-  return services;
-};
-const toggleSlotStatusInDB = async (slotId: string) => {
-  const slot = await Slot.findById(slotId);
-
+// Find single slot by ID
+const findSingleSlot = async (id: string) => {
+  const slot = await Slot.findById(id);
   if (!slot) {
-    throw new AppError(httpStatus.NOT_FOUND, "Slot not found!");
+    throw new AppError(httpStatus.NOT_FOUND, "Slot not found");
   }
-
-  if (slot.isBooked === "booked") {
-    throw new AppError(httpStatus.BAD_REQUEST, "Cannot update the status of a booked slot.");
-  }
-
-  // Toggle the status between available and canceled
-  slot.isBooked = slot.isBooked === "available" ? "canceled" : "available";
-  await slot.save();
-
   return slot;
 };
 
+// Update slot by ID
+const updateSlotIntoDB = async (id: string, payload: Partial<ISlot>) => {
+  const slot = await Slot.findById(id);
+  if (!slot) {
+    throw new AppError(httpStatus.NOT_FOUND, "Slot not found!");
+  }
+  const updatedSlot = await Slot.findByIdAndUpdate(id, payload, { new: true });
+  if (!updatedSlot) {
+    throw new AppError(httpStatus.NOT_MODIFIED, "Slot update failed!");
+  }
+  return updatedSlot;
+};
 
+// Delete slot by ID (hard delete)
+const deleteSlotIntoDB = async (id: string) => {
+  const slot = await Slot.findByIdAndDelete(id);
+  if (!slot) throw new AppError(httpStatus.NOT_FOUND, "Slot not found!");
+  return slot;
+};
 
-export const services = {
-  createSlotServicesIntoDB,
-  getAvilabeSlotIntoDB,
-  getAllSlotsIntoDB,
-  toggleSlotStatusInDB 
+export const slotService = {
+  createSlotsIntoDB,
+  getSlotsFromDB,
+  findSingleSlot,
+  updateSlotIntoDB,
+  deleteSlotIntoDB,
 };

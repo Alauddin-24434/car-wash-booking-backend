@@ -11,11 +11,11 @@ const router = express.Router();
 router.post(
   "/service",
   
-  upload.single("iamge"),
+  upload.single("image"),
   serviceControllers.createService,
 );
 
-router.get("/services", serviceControllers.getAllServices);
+router.get("/services", serviceControllers.getServices);
 router.get("/services/:id", serviceControllers.getSingleService);
 
 //Update Services (Only Accessible by Admin)
@@ -23,7 +23,8 @@ router.get("/services/:id", serviceControllers.getSingleService);
 router.put(
   "/services/:id",
  
-  validateRequest(zodServiceValidations.updateServiceZodValidationSchema),
+  upload.single("image"),
+  // validateRequest(zodServiceValidations.updateServiceZodValidationSchema),
   serviceControllers.UpdateServiceById,
 );
 

@@ -20,14 +20,91 @@ const createServiceServicesIntoDB = async (payload: IService) => {
 };
 
 // Get all services from the database
-const getAllServicesIntoDB = async () => {
-  const services = await Service.find({ isDeleted: { $ne: true } });
-  return services;
+export interface IServiceQueryParams {
+  searchTerm?: string;
+  category?: string;
+  popular?: boolean;
+  priceMin?: number;
+  priceMax?: number;
+  sort?: string;
+  limit?: number;
+  page?: number;
+}
+
+
+
+const getServicesFromDB = async (params: IServiceQueryParams) => {
+  const {
+    searchTerm,
+    category,
+    priceMin,
+    priceMax,
+    sort = "-createdAt",
+    limit = 10,
+    page = 1,
+  } = params;
+
+  const skip = (page - 1) * limit;
+  const filters: any = { isDeleted: false };
+
+  // 🔍 Case-insensitive search (name + description)
+  if (searchTerm?.trim()) {
+    const regex = new RegExp(searchTerm.trim(), "i");
+    filters.$or = [
+      { name: regex },
+      { description: regex },
+    ];
+  }
+
+  // ✅ Only apply category filter if not "all"
+  if (category && category.toLowerCase() !== "all") {
+    filters.category = { $regex: new RegExp(`^${category}$`, "i") };
+  }
+
+  // 💰 Price filtering
+  if (priceMin !== undefined || priceMax !== undefined) {
+    filters.price = {};
+    if (priceMin !== undefined) filters.price.$gte = priceMin;
+    if (priceMax !== undefined) filters.price.$lte = priceMax;
+  }
+
+  // 🔍 Fetch from DB
+  const services = await Service.find(filters)
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Service.countDocuments(filters);
+
+  return {
+    services,
+    meta: {
+      total,
+      page,
+      limit,
+    },
+  };
 };
+
+
 
 // Get a single service by ID from the database
 const getSingleServiceIntoDB = async (id: string) => {
-  return findService(id);
+  
+ 
+  const service = await Service.findById(id);
+  if (!service) {
+    throw new AppError(404, "Service not found");
+  }
+
+  // Related services query (e.g., same category, excluding current one)
+  const relatedServices = await Service.find({
+    category: service.category,
+    _id: { $ne: id },
+  }).limit(4);
+
+  return { service, relatedServices }
+
 };
 
 // Update a service by ID in the database
@@ -51,7 +128,7 @@ const deletedServicesIntoDB = async (id: string) => {
 // Export all service functions
 export const services = {
   createServiceServicesIntoDB,
-  getAllServicesIntoDB,
+  getServicesFromDB,
   getSingleServiceIntoDB,
   updateServicesIntoDB,
   deletedServicesIntoDB,

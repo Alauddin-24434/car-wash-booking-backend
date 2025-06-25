@@ -6,7 +6,6 @@ export interface IService extends Document {
   category: string
   description: string
   price: number
-  originalPrice: number
   duration: number
   image: string
   features: string[]

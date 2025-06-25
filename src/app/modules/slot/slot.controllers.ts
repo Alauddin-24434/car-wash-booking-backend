@@ -1,80 +1,55 @@
-import httpStatus from "http-status";
+
 import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { services } from "./slot.services";
+import { slotService } from "./slot.services";
 
-// Create service
-const createSlot = catchAsync(async (req, res) => {
-  const duration = 60; // Assume 60 minutes for the example
-
-  const serviceData = req.body;
-  
-
-  const result = await services.createSlotServicesIntoDB(serviceData, duration);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+export const createSlots = catchAsync(async (req, res) => {
+  const payload = req.body;
+  const createdSlots = await slotService.createSlotsIntoDB(payload);
+  console.log("res",createSlots)
+  res.status(201).json({
     success: true,
-    message: "Slot created successfully",
-    data: result,
+    data: createdSlots,
+    message: "Slot(s) created successfully",
   });
 });
 
-export const getAvailableSlots = catchAsync(async (req, res) => {
-  const { date, serviceId } = req.query;
-  console.log(date,serviceId)
-
-  if (!date || !serviceId) {
-    res
-      .status(400)
-      .json({ success: false, message: "Date and serviceId are required" });
-    return;
-  }
-
-  const slots = await services.getAvilabeSlotIntoDB(
-    serviceId as string,
-    date as string,
-  );
-  //  console.log(slots)
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+export const getSlots = catchAsync(async (req, res) => {
+  const queryParams = req.query as any;
+  const { slots, meta } = await slotService.getSlotsFromDB(queryParams);
+  res.status(200).json({
     success: true,
-    message: "Available slots retrieved successfully",
     data: slots,
+    meta,
   });
 });
 
+export const getSingleSlot = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const slot = await slotService.findSingleSlot(id);
 
-const getAllSlots = catchAsync(async (req, res) => {
-  const result = await services.getAllSlotsIntoDB();
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+  res.status(200).json({
     success: true,
-    message: "Slots retrieved successfully",
-    data: result,
+    data: slot,
   });
 });
 
-
-const toggleSlotStatus = catchAsync(async (req, res) => {
-  const { slotId } = req.params;
-
-  const result = await services.toggleSlotStatusInDB(slotId);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+export const updateSlot = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const payload = req.body;
+  const updatedSlot = await slotService.updateSlotIntoDB(id, payload);
+  res.status(200).json({
     success: true,
-    message: "Slot status updated successfully",
-    data: result,
+    data: updatedSlot,
+    message: "Slot updated successfully",
   });
 });
 
-
-export const slotControllers = {
-  createSlot,
-  getAvailableSlots,
-  getAllSlots,
-  toggleSlotStatus
-};
+export const deleteSlot = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const deletedSlot = await slotService.deleteSlotIntoDB(id);
+  res.status(200).json({
+    success: true,
+    data: deletedSlot,
+    message: "Slot deleted successfully",
+  });
+});
