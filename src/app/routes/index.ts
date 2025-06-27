@@ -6,6 +6,7 @@ import { BookingRoutes } from "../modules/Booking/booking.route";
 import { AuthRoutes } from "../modules/auth/auth.route";
 
 import { reviewRoutes } from "../modules/review/review.route";
+import { cartRoute } from "../modules/cart/cart.route";
 
 const router = Router();
 
@@ -34,6 +35,10 @@ const moduleRoutes = [
   {
     path: "/api",
     route: reviewRoutes,
+  },
+  {
+    path: "/api",
+    route: cartRoute,
   },
 ];
 

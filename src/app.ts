@@ -24,8 +24,9 @@ app.use("/", router);
 
 
 
-app.get("/admin/dashboard", async (req: Request, res: Response) => {
+app.get("/api/dashboard/admin", async (req: Request, res: Response) => {
   try {
+    // === ১. সার্ভিস সম্পর্কিত স্ট্যাটস
     const totalServices = await Service.countDocuments();
 
     const services = await Service.aggregate([
@@ -68,6 +69,7 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
       },
     ]);
 
+    // === ২. স্লট সম্পর্কিত স্ট্যাটস (status অনুসারে)
     const slotStatsByStatus = await Slot.aggregate([
       {
         $group: {
@@ -91,7 +93,10 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
     ]);
 
     const totalSlots = await Slot.countDocuments();
+
+    // === ৩. বুকিং ও পেমেন্ট সম্পর্কিত স্ট্যাটস
     const totalBookings = await Booking.countDocuments();
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayBookings = await Booking.countDocuments({ createdAt: { $gte: today } });
@@ -134,8 +139,10 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
       },
     ]);
 
+    // === ৪. ইউজার ও ক্লায়েন্ট স্ট্যাটস
     const totalUsers = await User.countDocuments();
     const activeUsers = await User.countDocuments({ isActive: true });
+
     const newRegistrations = await User.aggregate([
       {
         $group: {
@@ -152,6 +159,7 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
       },
     ]);
 
+    // === ৫. অন্যান্য স্ট্যাটস
     const topBookers = await Booking.aggregate([
       { $group: { _id: "$userId", bookings: { $sum: 1 } } },
       { $sort: { bookings: -1 } },
@@ -290,21 +298,11 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
       {
         $group: {
           _id: null,
-          newUsers: {
-            $sum: { $cond: [{ $eq: ["$bookings", 1] }, 1, 0] },
-          },
-          returningUsers: {
-            $sum: { $cond: [{ $gt: ["$bookings", 1] }, 1, 0] },
-          },
+          newUsers: { $sum: { $cond: [{ $eq: ["$bookings", 1] }, 1, 0] } },
+          returningUsers: { $sum: { $cond: [{ $gt: ["$bookings", 1] }, 1, 0] } },
         },
       },
-      {
-        $project: {
-          _id: 0,
-          newUsers: 1,
-          returningUsers: 1,
-        },
-      },
+      { $project: { _id: 0, newUsers: 1, returningUsers: 1 } },
     ]);
 
     const paymentMethodStats = await Booking.aggregate([
@@ -344,9 +342,45 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
       { $limit: 7 },
     ]);
 
+    // === ডাইনামিক adminStats হিসাবের জন্য আগের মাসের ডেটা নেওয়া
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    // আগের মাসের ইউজার সংখ্যা
+    const prevUsersCount = await User.countDocuments({ createdAt: { $lt: oneMonthAgo } });
+    // আগের মাসের বুকিং সংখ্যা
+    const prevBookingsCount = await Booking.countDocuments({ createdAt: { $lt: oneMonthAgo } });
+    // আগের মাসের মোট আয়
+    const prevPaymentAggregation = await Payment.aggregate([
+      { $match: { createdAt: { $lt: oneMonthAgo } } },
+      {
+        $group: {
+          _id: null,
+          totalPaidAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    const prevTotalRevenue = prevPaymentAggregation[0]?.totalPaidAmount || 0;
+
+    // পার্সেন্টেজ চেঞ্জ হিসাব
+    const usersChange = prevUsersCount ? ((totalUsers - prevUsersCount) / prevUsersCount) * 100 : 0;
+    const bookingsChange = prevBookingsCount ? ((totalBookings - prevBookingsCount) / prevBookingsCount) * 100 : 0;
+    const revenueChange = prevTotalRevenue ? ((totalPaidAmount - prevTotalRevenue) / prevTotalRevenue) * 100 : 0;
+
     res.status(200).json({
       success: true,
       data: {
+        // ফ্ল্যাট স্ট্যাটস
+        totalRevenue: totalPaidAmount,
+        revenueChange: +revenueChange.toFixed(2),
+        totalUsers,
+        usersChange: +usersChange.toFixed(2),
+        totalBookings,
+        bookingsChange: +bookingsChange.toFixed(2),
+        totalServices,
+        servicesChange: 2.1, // তোমার লজিক অনুযায়ী চাইলে যোগ করো
+
+        // আগের ডেটা
         serviceStats: { totalServices, services },
         slotStats: { totalSlots, slotStatsByStatus },
         bookingStats: {
@@ -381,6 +415,8 @@ app.get("/admin/dashboard", async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to load dashboard data", error: error.message });
   }
 });
+
+
 
 
 

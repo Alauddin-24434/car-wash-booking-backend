@@ -1,21 +1,57 @@
 import { TUpdateUser, TUser } from "./user.interface";
-import {  User } from "./user.model";
+import { User } from "./user.model";
 
 
 
 
 
 
-const getUserById= async (id: string) => {
+const getUserById = async (id: string) => {
   // Find the user by email
   const user = await User.findById(id)
   return user;
 }
 
-const getAllUsersIntoDB= async () => {
+export interface IUserQueryParams {
+  searchTerm?: string;
 
-  const user = await User.find()
-  return user;
+  sort?: string;
+  limit?: number;
+  page?: number;
+
+}
+
+const getUsersIntoDB = async (params:IUserQueryParams) => {
+
+  const {searchTerm, sort = "-createdAt", limit=10, page=1} =params;
+
+  const skip= (page-1)*limit;
+  const filters:any= {isDeleted:false};
+  if(searchTerm?.trim()){
+    const regex= new RegExp(searchTerm.trim(), "i");
+    filters.$or=[
+      {
+        name:regex
+      },
+      {
+        email:regex
+      }
+    ]
+  }
+
+
+
+  const users = await User.find(filters).sort(sort).skip(skip).limit(limit);
+  const total= await User.countDocuments(filters);
+
+  return {
+    users,
+    meta:{
+      total,
+      page,
+      limit
+    }
+  }
 }
 
 
@@ -58,7 +94,7 @@ const updateUserDataThroughUser = async (userId: string, userInfo: Partial<TUser
 
     // Perform the update
     const result = await User.updateOne({ _id: userId }, updatedUserData);
-console.log("result", result)
+    console.log("result", result)
     // Check if the update was successful
     if (result.modifiedCount > 0) {
       return result;
@@ -82,6 +118,6 @@ export const userServices = {
 
   getUserById,
   updateUserDataThroughUser,
-  getAllUsersIntoDB,
+ getUsersIntoDB,
   updateUserRoleInDB, // Export the new service function
 };

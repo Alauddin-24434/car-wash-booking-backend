@@ -1,27 +1,50 @@
-import { model, Schema } from "mongoose";
-import { TPaymentData } from "./payment.interface";
+import { Schema, model } from "mongoose";
 
-const PaymentSchema = new Schema<TPaymentData>({
-    transactionId: { type: String, required: true },
-    bookingId: { type: String, required: true },
-    amount: { type: Number, required: true },
+export const paymentStatusTypes = ["initiated", "success", "failed", "cancelled"] as const;
+
+const paymentSchema = new Schema(
+  {
+    transactionId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    bookingId: {
+      type: Schema.Types.ObjectId,
+      ref: "Booking",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
     name: {
-        type: String,
-        required: [true, "User name is required"],
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: [true, "User email is required"],
+      type: String,
+      required: true,
     },
     phone: {
-        type: String,
-        required: [true, "User phone is required"],
+      type: String,
+      required: true,
     },
-    address: {
-        type: String,
-        required: [true, "User address is required"],
+    paymentStatus: {
+      type: String,
+      enum: paymentStatusTypes,
+      default: "initiated",
     },
-    paymentStatus: { type: String, required: true },
-});
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+  }
+);
 
-export const Payment = model<TPaymentData>('Payment', PaymentSchema); // Corrected export name
+export const Payment = model("Payment", paymentSchema);

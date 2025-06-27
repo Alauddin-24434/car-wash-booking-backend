@@ -7,16 +7,9 @@ export interface ISlot {
   startTime: string     // e.g. "10:00 AM" - slot শুরু সময়
   endTime: string       // e.g. "11:00 AM" - slot শেষ সময়
   duration: number      // in minutes, (optional but handy)
-  capacity: number
-  booked: number
-  available: number
   status: "available" | "full" | "blocked"
  
   serviceId: Types.ObjectId  // Reference to Service collection
-
-  recurring?: boolean          // Optional: is recurring slot
-  repeatDays?: number          // Optional: repeat how many days (for daily recurring)
-  blockedDates?: string[]      // Optional: admin blocked dates, store as ISO strings
 }
 
 

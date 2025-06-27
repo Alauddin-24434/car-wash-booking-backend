@@ -1,7 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 import { ISlot } from "./slot.interface";
 
-const slotSchema = new Schema({
+export const slotSchema = new Schema({
   date: {
     type: String,
     required: true, // ISO date string, e.g. "2025-06-25"
@@ -18,21 +18,7 @@ const slotSchema = new Schema({
     type: Number,
     required: true, // minutes
   },
-  capacity: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-  booked: {
-    type: Number,
-    default: 0,
-    min: 0,
-  },
-  available: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
+
   status: {
     type: String,
     enum: ["available", "full", "blocked"],
@@ -44,18 +30,7 @@ const slotSchema = new Schema({
     ref: "Service",
     required: true,
   },
-  recurring: {
-    type: Boolean,
-    default: false,
-  },
-  repeatDays: {
-    type: Number,
-    default: 0,
-  },
-  blockedDates: {
-    type: [String], // array of ISO date strings
-    default: [],
-  },
+
 }, {
   timestamps: true,
 });

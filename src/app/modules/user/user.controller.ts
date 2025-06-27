@@ -20,10 +20,11 @@ console.log(id)
   });
 });
 // get all users
-const getAllUsers = catchAsync(async (req, res) => {
+const getUsers = catchAsync(async (req, res) => {
 
+  const query= req.query;
 
-  const result = await userServices.getAllUsersIntoDB();
+  const result = await userServices.getUsersIntoDB(query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -63,6 +64,6 @@ export const userControllers = {
 
   getUserById,
   updateUserThroughUser,
-  getAllUsers,
+  getUsers,
   updateUserRole, // Export the new controller function
 };

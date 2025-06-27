@@ -16,7 +16,7 @@ router.get(
 router.get(
   "/users",
  
-  userControllers.getAllUsers,
+  userControllers.getUsers,
 );
 router.put('/users/:id',authValidation('admin'),  userControllers.updateUserRole);
 router.put('/users/throughUser/:id',authValidation('user'),  userControllers.updateUserThroughUser);

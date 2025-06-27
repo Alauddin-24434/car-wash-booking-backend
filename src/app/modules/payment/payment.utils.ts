@@ -1,31 +1,33 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import config from '../../config';
+import { TPaymentData } from './payment.interface';
 
-dotenv.config();
 
-const AMARPAY_URL = config.payment_url;
-const STORE_ID = config.stote_id;
-const SIGNATURE_KEY = config.signature_key;
 
-export const initiatePayment = async (transactionId: string, name: string, email: string, phone: string, address: string, amount: number) => {
+const isSandbox = config.aamarpay_sanbox_mode === "true";
+const aamarPayUrl = isSandbox
+    ? "https://sandbox.aamarpay.com/jsonpost.php"
+    : "https://secure.aamarpay.com/jsonpost.php";
+
+export const initiatePayment = async (payload: TPaymentData) => {
     try {
-        const response = await axios.post(`${AMARPAY_URL}/jsonpost.php`, {
-            store_id: STORE_ID,
-            signature_key: SIGNATURE_KEY,
-            cus_name: name,
-            cus_email: email,
-            cus_phone: phone,
-            cus_add1: address,
+        const response = await axios.post(`${aamarPayUrl}`, {
+            store_id: config.aamarpay_stote_id,
+            signature_key: config.aamarpay_signature_key,
+            cus_name: payload.name,
+            cus_email: payload.email,
+            cus_phone: payload.phone,
+            cus_add1: "dhaka",
             cus_add2: "Dhaka",
             cus_city: "Dhaka",
             cus_country: "Bangladesh",
             currency: "BDT",
-            amount,
-            tran_id: transactionId,
-            success_url: `https://car-wash-booking-system-liard.vercel.app/api/verify-payment?transactionId=${transactionId}`,
-            fail_url: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf6Z7CgLJ3JfLy4IREsARVyxcBnQQnHN40jw&s`,
-            cancel_url: `https://static.vecteezy.com/system/resources/previews/019/797/644/non_2x/failed-rubber-stamp-with-grunge-style-on-white-background-vector.jpg`,
+            amount: payload.amount,
+            tran_id: payload.transactionId,
+            success_url: `${config.aamarpay_sucess_url}?transactionId=${payload.transactionId}`,
+            fail_url: `${config.aamarpay_fail_url}`,
+            cancel_url: `${config.aamarpay_cancel_url}`,
             desc: "Course Fee",
             type: "json"
         });

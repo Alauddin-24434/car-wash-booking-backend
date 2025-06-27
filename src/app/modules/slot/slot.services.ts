@@ -1,79 +1,36 @@
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
 import { ISlot, ISlotQueryParams } from "./slot.interface";
-import { Types } from "mongoose";
 import { Slot } from "./slot.model";
 import type { SortOrder } from "mongoose";
+import { formatMinutesToTime, parseTimeToMinutes } from "./slot.utils";
 
-// Create slot(s), recurring logic included
-const createSlotsIntoDB = async (payload: ISlot & { repeatDays?: number; blockedDates?: string[] }) => {
-  const {
-    date,
-    startTime,
-    endTime,
-    duration,
-    capacity,
-    
-    serviceId,
-    recurring = false,
-    repeatDays = 0,
-    blockedDates = [],
-  } = payload;
 
-  // Friday (day 5) and blockedDates skip করব
-  const isDateBlocked = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.getDay() === 5 || blockedDates.includes(dateStr);
-  };
+const createSlotsIntoDB = async (payload: ISlot) => {
+  const { serviceId, date, startTime, endTime, duration } = payload;
 
-  const slotsToCreate: ISlot[] = [];
+  const slotsArry: ISlot[] = [];
 
-  if (recurring && repeatDays > 0) {
-    const startDate = new Date(date);
-    for (let i = 0; i < repeatDays; i++) {
-      const nextDate = new Date(startDate);
-      nextDate.setDate(startDate.getDate() + i);
-      const nextDateStr = nextDate.toISOString().split("T")[0];
-      if (isDateBlocked(nextDateStr)) continue;
+  const startMinutes = parseTimeToMinutes(startTime);
+  const endMinutes = parseTimeToMinutes(endTime);
 
-      slotsToCreate.push({
-        date: nextDateStr,
-        startTime,
-        endTime,
-        duration,
-        capacity,
-        booked: 0,
-        available: capacity,
-        status: "available",
-        serviceId: new Types.ObjectId(serviceId),
-        recurring,
-        blockedDates,
-      });
-    }
-  } else {
-    if (!isDateBlocked(date)) {
-      slotsToCreate.push({
-        date,
-        startTime,
-        endTime,
-        duration,
-        capacity,
-        booked: 0,
-        available: capacity,
-        status: "available",
-    
-        serviceId: new Types.ObjectId(serviceId),
-        recurring,
-        blockedDates,
-      });
-    } else {
-      throw new AppError(httpStatus.BAD_REQUEST, "Slot date is blocked or on Friday");
-    }
+  for (let time = startMinutes; time < endMinutes; time += duration) {
+    const slot: ISlot = {
+      serviceId,
+      date,
+      startTime: formatMinutesToTime(time),
+      endTime: formatMinutesToTime(time + duration),
+      duration,
+      status: "available",
+    };
+
+    const createSlot = await Slot.create(slot);
+    slotsArry.push(createSlot);
   }
 
-  const createdSlots = await Slot.insertMany(slotsToCreate);
-  return createdSlots;
+  return slotsArry;
 };
+
 
 // Get slots with optional filters (date, serviceId, availability)
 const getSlotsFromDB = async (params: ISlotQueryParams) => {
@@ -81,7 +38,6 @@ const getSlotsFromDB = async (params: ISlotQueryParams) => {
     date,
     serviceId,
     status,
-    availability,
     limit = 10,
     page = 1,
     sort = "date",
@@ -93,9 +49,7 @@ const getSlotsFromDB = async (params: ISlotQueryParams) => {
   if (serviceId) filters.serviceId = serviceId;
   if (status) filters.status = status;
 
-  if (availability !== undefined) {
-    filters.available = availability ? { $gt: 0 } : { $eq: 0 };
-  }
+
 
   // Sort options fix for TypeScript
   const sortOptions: { [key: string]: SortOrder } = sort === "date"
@@ -144,3 +98,6 @@ export const slotService = {
   updateSlotIntoDB,
   deleteSlotIntoDB,
 };
+
+
+

@@ -1,14 +1,9 @@
-// interfaces/payment.interface.ts
-export type TPaymentData ={
-    transactionId: string;
-    bookingId:string;
-    amount: number;
-    name: string;
-    email: string;
-    address: string;
-    phone: string;
-    paymentStatus:string;
-    
-   
-  }
-  
+export type TPaymentData = {
+  transactionId: string;
+  bookingId: string;
+  amount: number;
+  name: string;
+  email: string;
+  phone: string;
+  paymentStatus: "initiated" | "success" | "failed" | "cancelled";
+};
