@@ -14,6 +14,14 @@ const reviewSchema = new Schema<IReview>(
       ref: "Service",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
+    avatar: {
+      type: String,
+      required: true,
+    },
     rating: {
       type: Number,
       required: true,
@@ -24,9 +32,9 @@ const reviewSchema = new Schema<IReview>(
       type: String,
       required: true,
     },
-    isDeleted:{
-        type:Boolean,
-        default:false,
+    isDeleted: {
+      type: Boolean,
+      default: false,
     }
   },
   { timestamps: true }
@@ -34,3 +42,4 @@ const reviewSchema = new Schema<IReview>(
 
 // Create Review Model
 export const Review = model<IReview>("Review", reviewSchema);
+ 

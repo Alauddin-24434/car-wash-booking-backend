@@ -6,9 +6,10 @@ import notFound from "./app/middlewares/notFound";
 import cookieParser from 'cookie-parser';
 import { Service } from "./app/modules/service/service.model";
 import { Slot } from "./app/modules/slot/slot.model";
-import { Booking } from "./app/modules/Booking/booking.model";
+import { Booking } from "./app/modules/booking/booking.model";
 import { Payment } from "./app/modules/payment/payment.model";
 import { User } from "./app/modules/user/user.model";
+import config from "./app/config";
 
 const app: Application = express();
 
@@ -421,6 +422,9 @@ app.get("/api/dashboard/admin", async (req: Request, res: Response) => {
 
 
 app.get("/", (req: Request, res: Response) => {
+  console.log(config.aamarpay.success_url)
+  console.log(config.aamarpay.verify_url )
+  
   res.send("server is running on 5000");
 });
 app.use(globalErrorHandler);

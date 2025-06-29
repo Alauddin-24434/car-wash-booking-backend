@@ -1,81 +1,97 @@
 import axios from "axios";
 
-import { bookingService } from "../Booking/booking.services";
-import { TPaymentData } from "./payment.interface";
+import { bookingService } from "../booking/booking.services";
+import { Payment } from "./payment.model";
+import { Booking } from "../booking/booking.model";
+import mongoose from "mongoose";
+import { verifyPaymentWithAmarPay } from "../../utils/aamarpay.payment";
 
-const isSandbox = process.env.AAMARPAY_SANDBOX_MODE === "true";
-const aamarPayUrl = isSandbox
-  ? "https://sandbox.aamarpay.com/jsonpost.php"
-  : "https://secure.aamarpay.com/jsonpost.php";
 
-// Initiate Payment with AamarPay
-export const initiatePayment = async (data: TPaymentData) => {
-  const postData = {
-    store_id: process.env.AAMARPAY_STORE_ID,
-    signature_key: process.env.AAMARPAY_SIGNATURE_KEY,
-    tran_id: data.transactionId,
-    success_url: process.env.AAMARPAY_SUCCESS_URL,
-    fail_url: process.env.AAMARPAY_FAIL_URL,
-    cancel_url: process.env.AAMARPAY_CANCEL_URL,
-    amount: data.amount,
-    currency: "BDT",
-    desc: "Booking Payment",
-    cus_name: data.name,
-    cus_email: data.email,
-    cus_add1: data.address,
-    cus_phone: data.phone,
-    type: "json",
-    opt_a: data.bookingId, // Pass booking ID for later reference
-  };
+export const handlePaymentSuccess = async (transactionId: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  const response = await axios.post(aamarPayUrl, postData, {
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    // ✅ Step 1: Verify with AamarPay
+    const verificationResponse = await verifyPaymentWithAmarPay(transactionId);
+    console.log('AamarPay verification response:', verificationResponse);
 
-  if (response.data?.payment_url) {
+    // ✅ Step 2: Get payment record
+    const payment = await Payment.findOne({ transactionId }).session(session);
+    if (!payment) throw new Error('Payment not found');
+
+    // ✅ Step 3: Update status based on AamarPay response
+    if (
+      verificationResponse &&
+      verificationResponse.pay_status === "Successful"
+    ) {
+      payment.paymentStatus ="success" ;
+
+      // ✅ Also update booking as booked
+      await Booking.findByIdAndUpdate(
+        payment.bookingId,
+        { status: "paid" },
+        { session }
+      );
+    } else {
+      payment.paymentStatus = "failed";
+    }
+
+    // ✅ Step 4: Save changes
+    await payment.save({ session });
+    await session.commitTransaction();
+    session.endSession();
+
     return {
-      success: true,
-      paymentUrl: response.data.payment_url,
-      message: "Redirect to AamarPay",
+      status: payment.paymentStatus,
+      pay_status: verificationResponse.pay_status,
+      status_title: verificationResponse.status_title,
+      payment_type: verificationResponse.payment_type,
+      amount: verificationResponse.amount,
+
+      transactionId,
     };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  return { success: false, message: "Payment initialization failed" };
 };
 
-// Handle success callback
-export const handlePaymentSuccess = async (reqBody: any) => {
-  const { opt_a: bookingId, tran_id: transactionId } = reqBody;
 
-  if (!bookingId || !transactionId) {
-    return { success: false, message: "Invalid success data" };
-  }
-
-  await bookingService.updateBookingStatus(bookingId, "paid");
-
-  return {
-    success: true,
-    message: "Payment successful",
-    bookingId,
-    transactionId,
-  };
-};
-
-// Handle fail or cancel
 export const handlePaymentFailOrCancel = async (
-  reqBody: any,
-  status: "failed" | "cancelled"
+  transactionId: string,
+  status: "failed" | "cancelled" = "failed"
 ) => {
-  const { opt_a: bookingId } = reqBody;
-  const bookingStatus: "pending" | "paid" | "cancelled" =
-    status === "failed" ? "cancelled" : status;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (bookingId) {
-    await bookingService.updateBookingStatus(bookingId, bookingStatus);
+  try {
+    // ✅ Step 1: Find payment by transactionId
+    const payment = await Payment.findOne({ transactionId }).session(session);
+    if (!payment) throw new Error("Payment not found");
+
+    // ✅ Step 2: Update payment status
+    payment.paymentStatus = status;
+    await payment.save({ session });
+
+    // ✅ Optional: Update booking status as 'cancelled' if needed
+    await Booking.findByIdAndUpdate(
+      payment.bookingId,
+      { status: status },
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      status: payment.paymentStatus,
+      transactionId,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  return {
-    success: true,
-    message: `Payment ${status}`,
-  };
 };

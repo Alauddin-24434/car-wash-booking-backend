@@ -1,34 +1,73 @@
 import { Booking } from "./booking.model";
 import { IBooking } from "./booking.interface";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
+import { initiatePayment } from "../../utils/aamarpay.payment";
+import { Payment } from "../payment/payment.model";
+
+
+
 const createBooking = async (payload: IBooking) => {
-  const customTransactionId = uuidv4(); // ✅ Custom Unique ID
-  const bookData = {
-    ...payload,
-    transactionId: customTransactionId,
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const customTransactionId = uuidv4();
+    const bookData = {
+      ...payload,
+      transactionId: customTransactionId,
+    };
+
+    const booking = await Booking.create([bookData], { session });
+
+    const paymentInitiateData = {
+      transactionId: customTransactionId,
+      bookingId: booking[0]._id.toString(),
+      amount: booking[0].amount,
+      name: booking[0].name,
+      email: booking[0].email,
+      phone: booking[0].phone,
+      paymentStatus: "initiated" as "initiated",
+    };
+
+    const paymentResult = await initiatePayment(paymentInitiateData);
+
+
+    // ✅ শুধু error throw করো
+    if (!paymentResult?.payment_url) {
+      throw new Error("Payment initiation failed");
+    }
+
+
+    const paymentData = {
+      transactionId: customTransactionId,
+      bookingId: booking[0]._id.toString(),
+      amount: booking[0].amount,
+      name: booking[0].name,
+      email: booking[0].email,
+      phone: booking[0].phone,
+      paymentStatus: "initiated" as "initiated",
+    };
+
+    await Payment.create([paymentData], { session });
+
+
+    await session.commitTransaction();
+    return {
+      success: true,
+      message: "Booking and payment initiated successfully",
+      booking: booking[0],
+      paymentResult,
+    };
+  } catch (error: any) {
+
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-  const booking = await Booking.create(bookData);
-
-  // ২. পেমেন্ট ইনিশিয়েট করো (AamarPay এর জন্য)
-  const paymentResult = await initiatePayment({
-    transactionId: booking.transactionId!,
-    bookingId: booking._id.toString(),
-    amount: booking.amount,
-    name: booking.name,
-    email: booking.email,
-    phone: booking.phone,
-    address: "", // প্রয়োজনে address পাঠাও
-    paymentStatus: "initiated",
-  });
-
-  if (!paymentResult.success) {
-    return res.status(500).json({ success: false, message: "Payment initiation failed" });
-  }
+}
 
 
-
-};
 
 const getAllBookings = async () => {
   const bookings = await Booking.find()
